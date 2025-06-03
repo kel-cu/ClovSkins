@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "clovskins",
+  "version": "${version}",
+  "name": "ClovSkins",
+  "description": "Мод, который позволяет менять скин в самой игре",
+  "authors": ["Im_Kel"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/clovskins",
+    "issues": "https://github.com/kel-cu/clovskins/issues",
+    "sources": "https://github.com/kel-cu/clovskins",
+    "email": "me@kelcuprum.ru"
+  },
+  "license": "PolyForm Strict License 1.0.0",
+  "icon": "assets/clovskins/icon.png",
+  "accessWidener": "clovskins.accesswidener",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "ru.kelcuprum.clovskins.client.ClovSkins"
+    ],
+    "modmenu": [
+      "ru.kelcuprum.clovskins.client.gui.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": "*",
+    "fabric": "*",
+    "alinlib": "*",
+    "minecraft": "${minecraft_dependency}"
+  },
+  "mixins": [
+    "clovskins.mixin.json"
+  ],
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/clovskins",
+        "modmenu.donate": "https://kelcuprum.ru/r/don"
+      }
+    }
+  }
+}

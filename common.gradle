@@ -1,0 +1,155 @@
+apply plugin: 'maven-publish'
+apply plugin: 'fabric-loom'
+apply plugin: 'com.replaymod.preprocess'
+apply plugin: 'me.fallenbreath.yamlang'
+apply plugin: 'io.github.goooler.shadow'
+
+def mod_brand = "fabric"
+archivesBaseName = (project.archives_base_name == null ? rootProject.archives_base_name : project.archives_base_name) + "-" + mod_brand
+group = rootProject.maven_group
+
+int mcVersion = 1
+preprocess {
+    mcVersion = vars.get()["MC"] as int
+    tabIndentation = true
+    vars.put("WALTER", archivesBaseName.startsWith("Walter") ? 1 : 0)
+    vars.put("MC", mcVersion)
+    vars.put("FABRIC", mod_brand == 'fabric' ? 1 : 0)
+    vars.put("FORGE", mod_brand == 'forge' ? 1 : 0)
+    vars.put("NEOFORGE", mod_brand == 'neoforge' ? 1 : 0)
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url = "https://jitpack.io/" }
+    maven { url = "https://repo.u-team.info" }
+    maven { url = "https://maven.shedaniel.me/" }
+    maven { url = "https://api.modrinth.com/maven" }
+    maven { url = "https://maven.neoforged.net/releases/" } // NEOFORGE
+    maven { url = "https://maven.terraformersmc.com/releases" } // MODMENU
+    maven { url = "https://s01.oss.sonatype.org/content/repositories/releases" }
+    ////
+    maven { url = "https://repo.kelcuprum.ru/releases" }
+    maven { url = "https://repo.kelcuprum.ru/snapshots" }
+    maven { url = "https://repo.kelcuprum.ru/forks" }
+    maven { url = "https://repo.kelcuprum.ru/test" }
+}
+configurations {
+    modRuntimeOnly.exclude group: 'net.fabricmc', module: 'fabric-loader'
+}
+loom {
+    runConfigs.client {
+        // to make sure it generates all "Minecraft Client (:subproject_name)" applications
+        ideConfigGenerated = true
+        runDir '../../run'
+        vmArgs '-Dmixin.debug.export=true'
+    }
+    accessWidenerPath = file("../../src/main/resources/clovskins.accesswidener")
+    if (mod_brand == 'forge') {
+        forge {
+            convertAccessWideners = true
+        }
+    }
+}
+remapJar {
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+    // Include dep in fat jar with relocation and minimization
+    shadow
+    implementation.extendsFrom shadow
+}
+dependencies {
+    // loom
+    implementation("com.google.code.gson:gson:2.10.1")
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+    }
+    // Music
+    implementation("meteordevelopment:starscript:0.3.4")
+    include modImplementation("maven.modrinth:cicada:${project.cicada_version}")
+    modCompileOnly("maven.modrinth:entitytexturefeatures:${project.etf_version}")
+
+    include group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.10'
+    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.10'
+
+    include group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.10'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.10'
+
+    include group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.12'
+    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.12'
+
+    // Minecraft
+    if (mod_brand == 'fabric') {
+        modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+        modImplementation "ru.kelcuprum:AlinLib-fabric:${rootProject.alinlib}+mc${project.minecraft_version}"
+    }
+
+    subprojects.each {
+        implementation project(path: ":${it.name}", configuration: 'namedElements')
+        implementation project(path: ":${it.name}", configuration: 'shade')
+        include project("${it.name}:")
+    }
+}
+
+int JAVA_COMPATIBILITY
+if (mcVersion >= 12005) {
+    JAVA_COMPATIBILITY = 21
+} else {
+    JAVA_COMPATIBILITY = 17
+}
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = JAVA_COMPATIBILITY
+}
+
+shadowJar {
+    configurations = [project.configurations.shade]
+    destinationDirectory.set(layout.buildDirectory.dir('devlibs'))
+}
+
+remapJar {
+    dependsOn tasks.shadowJar
+    inputFile.set(tasks.shadowJar.archiveFile)
+}
+
+components.java.withVariantsFromConfiguration(configurations.shadowRuntimeElements) { skip() }
+
+jar {
+    from("LICENSE.md") {
+        rename { "${it}_${project.archivesBaseName}"}
+    }
+}
+
+version = project.mod_version + "+mc" + project.minecraft_version
+
+processResources {
+    inputs.property "version", version
+    inputs.property "minecraft_dependency", project.minecraft_dependency
+
+    [
+            'fabric'  : ['fabric.mod.json'],
+            'neoforge': ['META-INF/neoforge.mods.toml'],
+            'forge'   : ['META-INF/mods.toml', 'pack.mcmeta'],
+    ].forEach { brand, files ->
+        files.forEach { name ->
+            if (brand == mod_brand) {
+                filesMatching(name) {
+                    def valueMap = [
+                            "version"             : version,
+                            "minecraft_dependency": project.minecraft_dependency,
+                    ]
+                    expand valueMap
+                }
+            } else {
+                exclude name
+            }
+        }
+    }
+}

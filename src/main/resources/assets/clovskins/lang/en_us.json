@@ -1,0 +1,24 @@
+{
+  "clovskins" : "ClovSkins",
+  "clovskins.main": "Это вы, %s!",
+  "clovskins.main.select" : "Выбрать скин",
+  "clovskins.main.options" : "Настройки игрока",
+  "clovskins.main.configs" : "Настройки мода",
+
+  "clovskins.select": "Ваши скины",
+  "clovskins.select.edit": "Редактировать",
+  "clovskins.select.create": "Создать скин",
+  "clovskins.select.cape": "Ваши плащи",
+  "clovskins.select.cape.inactive": "Нет плаща",
+
+  "clovskins.edit": "Редактирование скина",
+  "clovskins.edit.name": "Имя",
+  "clovskins.edit.url": "Ссылка/Путь до файла",
+  "clovskins.edit.file_select": "Выбрать файл",
+  "clovskins.edit.type": "Тип",
+  "clovskins.edit.type.nickname": "Никнейм",
+  "clovskins.edit.model": "Модель",
+  "clovskins.edit.select_cape": "Выбрать плащ",
+
+  "clovskins.open_gui": "Скины"
+}
