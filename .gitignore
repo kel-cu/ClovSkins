@@ -14,7 +14,7 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 run
-
+run/**
 # Eclipse Gradle plugin generated files
 # Eclipse Core
 .project
@@ -22,3 +22,4 @@ run
 .classpath
 .idea
 .vscode
+
