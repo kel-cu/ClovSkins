@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.editbox.EditBoxBuilder;
+import ru.kelcuprum.alinlib.gui.components.builder.text.TextBuilder;
 import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
@@ -32,8 +33,10 @@ public class CreateSkin extends Screen {
     protected void init() {
         int componentsWidth = width / 2;
         int x = width / 4;
-        int y = height / 2 - 22;
+        int y = height / 2 - 34;
         addRenderableWidget(new EditBoxBuilder(Component.translatable("clovskins.create.file_name"), (s) -> name = s).setValue(name).setWidth(componentsWidth).setPosition(x, y).build());
+        y+=24;
+        addRenderableWidget(new TextBuilder(Component.translatable("clovskins.create.file_name.description")).setType(TextBuilder.TYPE.BLOCKQUOTE).setWidth(componentsWidth).setPosition(x, y).build());
         y+=24;
         addRenderableWidget(new ButtonBuilder(CommonComponents.GUI_BACK, (s) -> onClose()).setWidth(componentsWidth / 2 -2).setPosition(x, y).build());
         addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.create.execute"), (s) -> create()).setWidth(componentsWidth / 2 -2).setPosition(x+2+componentsWidth/2, y).build());
@@ -46,6 +49,7 @@ public class CreateSkin extends Screen {
     }
 
     public void create(){
+        name = name.toLowerCase();
         if(ResourceLocation.isValidPath(name)){
             File file = new File(getPath()+"/skins/"+name+".json");
             try {

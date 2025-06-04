@@ -16,6 +16,11 @@
   "clovskins.config.menu.title": "Кнопка в главном меню",
   "clovskins.config.menu.pause": "Кнопка в меню паузы",
 
+  "clovskins.create": "Создание скина",
+  "clovskins.create.file_name": "Название файла",
+  "clovskins.create.file_name.description": "Формат названия: [a-z0-9-_]",
+  "clovskins.create.execute": "Создать",
+
   "clovskins.main": "Это вы, %s!",
   "clovskins.main.select" : "Выбрать скин",
   "clovskins.main.options" : "Настройки игрока",
