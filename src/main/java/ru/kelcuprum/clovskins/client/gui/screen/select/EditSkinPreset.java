@@ -4,6 +4,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
@@ -12,15 +15,19 @@ import ru.kelcuprum.alinlib.gui.components.builder.selector.SelectorBuilder;
 import ru.kelcuprum.alinlib.gui.components.buttons.Button;
 import ru.kelcuprum.alinlib.gui.components.editbox.EditBox;
 import ru.kelcuprum.alinlib.gui.components.selector.SelectorButton;
+import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
 import ru.kelcuprum.clovskins.client.gui.cicada.DummyClientPlayerEntity;
 import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.UUID;
 
 import static ru.kelcuprum.alinlib.gui.Colors.BLACK_ALPHA;
+import static ru.kelcuprum.alinlib.gui.Icons.DONT;
+import static ru.kelcuprum.clovskins.client.ClovSkins.getPath;
 
 public class EditSkinPreset extends Screen {
     public Screen parent;
@@ -59,7 +66,9 @@ public class EditSkinPreset extends Screen {
         addRenderableWidget(new EditBoxBuilder(Component.translatable("clovskins.edit.name"), (s) -> skinOption.name = s).setValue(skinOption.name).setWidth(componentSize).setPosition(x, y).build());
         y+=25;
         editBox = (EditBox) addRenderableWidget(new EditBoxBuilder(Component.translatable("clovskins.edit.url"), (s) -> skinOption.setSkinTexture(skinOption.type, s)).setValue(skinOption.skin).setWidth(componentSize).setPosition(x, y).build());
-        file = (Button) addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.file_select"), (s) -> {}).setSprite(GuiUtils.getResourceLocation("clovskins", "texture/icons/file.png")).setWidth(20).setPosition(x+componentSize+5, y).build());
+        file = (Button) addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.file_select"), (s) -> {
+            openTrackEditor();
+        }).setSprite(GuiUtils.getResourceLocation("clovskins", "texture/icons/file.png")).setWidth(20).setPosition(x+componentSize+5, y).build());
         y+=25;
         addRenderableWidget(new SelectorBuilder(Component.translatable("clovskins.edit.type")).setList(new String[] {
             Component.translatable("clovskins.edit.type.nickname").getString(),
@@ -79,6 +88,25 @@ public class EditSkinPreset extends Screen {
         // -------------------- -
         // --------- ----------
         // --------------------
+    }
+
+    public void openTrackEditor(){
+        MemoryStack stack = MemoryStack.stackPush();
+        PointerBuffer filters = stack.mallocPointer(1);
+        filters.put(stack.UTF8("*.png"));
+
+        filters.flip();
+        File defaultPath = new File(getPath()).getAbsoluteFile();
+        String defaultString = defaultPath.getAbsolutePath();
+        if(defaultPath.isDirectory() && !defaultString.endsWith(File.separator)){
+            defaultString += File.separator;
+        }
+
+        String result = TinyFileDialogs.tinyfd_openFileDialog(Component.translatable("clovskins.edit.file_selector").getString(), defaultString, filters, Component.translatable("clovskins.edit.file_selector.description").getString(), false);
+        if(result == null) return;
+        File file = new File(result);
+        if(file.exists()) editBox.setValue(file.getAbsolutePath());
+        else new ToastBuilder().setIcon(DONT).setType(ToastBuilder.Type.ERROR).setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.edit.file_not_exist")).buildAndShow();
     }
 
     @Override
@@ -125,8 +153,8 @@ public class EditSkinPreset extends Screen {
         try {
             skinOption.save();
             if(ClovSkins.currentSkin == skinOptionOriginal) {
-                ClovSkins.currentSkin = skinOption;
                 if(!skinOption.equals(skinOptionOriginal)) skinOption.uploadToMojangAPI();
+                ClovSkins.currentSkin = skinOption;
             }
             ClovSkins.skinOptions.put(key, skinOption);
         } catch (Exception exception){
