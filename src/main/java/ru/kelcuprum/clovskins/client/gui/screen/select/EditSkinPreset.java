@@ -123,7 +123,6 @@ public class EditSkinPreset extends Screen {
     public void onClose() {
         if(minecraft == null) return;
         try {
-            skinOption.uploadToMojangAPI();
             skinOption.save();
             if(ClovSkins.currentSkin == skinOptionOriginal) {
                 ClovSkins.currentSkin = skinOption;

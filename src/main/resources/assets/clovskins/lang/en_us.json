@@ -20,5 +20,8 @@
   "clovskins.edit.model": "Модель",
   "clovskins.edit.select_cape": "Выбрать плащ",
 
+  "clovskins.upload.done": "Ваш скин %s был успешно загружен!",
+  "clovskins.upload.multiplayer": "Чтобы игроки этого сервера увидела ваш замечательный скин, то вам придется перезайти на сервер!",
+
   "clovskins.open_gui": "Скины"
 }

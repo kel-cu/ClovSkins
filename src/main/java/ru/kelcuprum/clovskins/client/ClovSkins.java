@@ -104,9 +104,6 @@ public class ClovSkins implements ClientModInitializer {
     }
 
     public void loadSkins(){
-//        if(config.getBoolean("FIRST_LOAD", true)){
-//            config.setBoolean("FIRST_LOAD", false);
-//        }
         if(Player.isLicenseAccount()) {
             JsonObject defaultSkin = new JsonObject();
             defaultSkin.addProperty("name", Player.getName());

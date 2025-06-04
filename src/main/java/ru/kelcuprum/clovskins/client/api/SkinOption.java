@@ -15,25 +15,27 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.WebAPI;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
+import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.alinlib.info.Player;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.annotation.Native;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 
 import static ru.kelcuprum.alinlib.utils.GsonHelper.getStringInJSON;
+import static ru.kelcuprum.alinlib.utils.GsonHelper.jsonElementIsNull;
 import static ru.kelcuprum.clovskins.client.ClovSkins.getPath;
 
 public class SkinOption {
@@ -59,7 +61,7 @@ public class SkinOption {
         this.skin = playerSkin.textureUrl();
         this.cape = "";
         this.model = playerSkin.model();
-        this.type = null;
+        this.type = SkinType.URL;
         this.file = file;
     }
 
@@ -73,7 +75,8 @@ public class SkinOption {
 
 
     public ResourceLocation getTextureSkin() throws IOException {
-        ResourceLocation location = GuiUtils.getResourceLocation("clovskins", "skins_"+ file == null ? name.toLowerCase() : file.getName());
+        ResourceLocation location = GuiUtils.getResourceLocation("clovskins", "skins_"+ (file == null ? name.toLowerCase() : file.getName()));
+        if(skin.isBlank()) return DefaultPlayerSkin.getDefaultTexture();
         if(!ClovSkins.cacheResourceLocations.containsKey(skin)) {
             BufferedImage image = getSourceSkin();
             if(image == null) return DefaultPlayerSkin.getDefaultTexture();
@@ -100,34 +103,40 @@ public class SkinOption {
         return image;
     }
 
+    public long lastUpdate = System.currentTimeMillis();
+
     public static HashMap<String, BufferedImage> resourceLocationMap = new HashMap<>();
     public static HashMap<String, Boolean> urls = new HashMap<>();
     public BufferedImage getTexture() {
         if (resourceLocationMap.containsKey(skin)) return resourceLocationMap.get(skin);
         else {
             if (!urls.getOrDefault(skin, false)) {
-                urls.put(skin, true);
-                new Thread(() -> {
-                    BufferedImage image = null;
-                    try {
-                        switch (type){
-                            case URL -> image = ImageIO.read(new URL(skin));
-                            case FILE -> image = ImageIO.read(new File(skin));
-                            case NICKNAME -> {
-                                try {
-                                    JsonObject json = WebAPI.getJsonObject(String.format("https://api.kelcuprum.ru/playerdata?name=%s", skin));
-                                    model = getStringInJSON("model", json, "standart").equals("slim") ? PlayerSkin.Model.SLIM : PlayerSkin.Model.WIDE;
-                                    image = ImageIO.read(new URL(getStringInJSON("skin", json, "https://textures.minecraft.net/texture/d5c4ee5ce20aed9e33e866c66caa37178606234b3721084bf01d13320fb2eb3f")));
-                                } catch (Exception exception){
-                                    exception.printStackTrace();
+                if(System.currentTimeMillis() - lastUpdate > 1500) {
+                    lastUpdate = System.currentTimeMillis();
+                    urls.put(skin, true);
+                    new Thread(() -> {
+                        BufferedImage image = null;
+                        try {
+                            switch (type){
+                                case URL -> image = ImageIO.read(new URL(skin));
+                                case FILE -> image = ImageIO.read(new File(skin));
+                                case NICKNAME -> {
+                                    try {
+                                        JsonObject json = MojangAPI.getSkinURL(skin);
+                                        if(json == null) return;
+                                        model = jsonElementIsNull("metadata.model", json) ? PlayerSkin.Model.WIDE : PlayerSkin.Model.SLIM;
+                                        image = ImageIO.read(new URL(getStringInJSON("url", json, "https://textures.minecraft.net/texture/d5c4ee5ce20aed9e33e866c66caa37178606234b3721084bf01d13320fb2eb3f")));
+                                    } catch (Exception exception){
+                                        exception.printStackTrace();
+                                    }
                                 }
                             }
+                        } catch (Exception ex){
+                            ex.printStackTrace();
                         }
-                    } catch (Exception ex){
-                        ex.printStackTrace();
-                    }
-                    resourceLocationMap.put(skin, image);
-                }).start();
+                        resourceLocationMap.put(skin, image);
+                    }).start();
+                }
             }
             return null;
         }
@@ -150,27 +159,14 @@ public class SkinOption {
         else Files.writeString(file.toPath(), toString(), StandardCharsets.UTF_8);
     }
 
-    public JsonObject toJSON(){
-        JsonObject json = new JsonObject();
-        json.addProperty("name", name);
-        json.addProperty("skin", skin);
-        json.addProperty("cape", cape);
-        json.addProperty("type", type == SkinType.URL ? "url" : type == SkinType.FILE ? "file" : "nickname");
-        json.addProperty("model", model.id());
-        return json;
-    }
-
-    @Override
-    public String toString() {
-        return toJSON().toString();
-    }
-
     public void uploadToMojangAPI() throws IOException {
         if(Player.isLicenseAccount()){
             uploadSkinToMojangAPI();
             if(cape.isBlank()) hideCapeToMojangAPI();
             else activeCapeToMojangAPI();
-
+            new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.upload.done", name)).buildAndShow();
+            if(AlinLib.MINECRAFT.level != null && !AlinLib.MINECRAFT.isSingleplayer() && !AlinLib.MINECRAFT.isLocalServer())
+                new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.upload.multiplayer")).setType(ToastBuilder.Type.WARN).buildAndShow();
         } else ClovSkins.logger.log("Не чет не хочу");
     }
 
@@ -194,25 +190,25 @@ public class SkinOption {
         }
         else {
             file.delete();
-            throw new RuntimeException(response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+            throw new RuntimeException("[SKIN] "+response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
         }
     }
     public void activeCapeToMojangAPI() throws IOException{
         String accessToken = AlinLib.MINECRAFT.getUser().getAccessToken();
-        HttpPost http = new HttpPost("https://api.minecraftservices.com/minecraft/profile/capes/active");
+        HttpPut http = new HttpPut("https://api.minecraftservices.com/minecraft/profile/capes/active");
         HttpClient httpClient = HttpClientBuilder.create().build();
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("capeId", cape);
         http.setEntity(new StringEntity(jsonObject.toString()));
         http.addHeader("Authorization", "Bearer " + accessToken);
+        http.addHeader("Content-Type", "application/json");
         HttpResponse response = httpClient.execute(http);
         if(response.getStatusLine().getStatusCode() == 200){
             ClovSkins.logger.log("ok");
         }
-
         else {
-            throw new RuntimeException(response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+            throw new RuntimeException("[CAPE] "+response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
         }
     }
     public void hideCapeToMojangAPI() throws IOException{
@@ -225,11 +221,25 @@ public class SkinOption {
             ClovSkins.logger.log("ok");
         }
         else {
-            throw new RuntimeException(response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+            throw new RuntimeException("[CAPE] "+response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
         }
     }
 
     // Хуета
+    public JsonObject toJSON(){
+        JsonObject json = new JsonObject();
+        json.addProperty("name", name);
+        json.addProperty("skin", skin);
+        json.addProperty("cape", cape);
+        json.addProperty("type", type == SkinType.URL ? "url" : type == SkinType.FILE ? "file" : "nickname");
+        json.addProperty("model", model.id());
+        return json;
+    }
+
+    @Override
+    public String toString() {
+        return toJSON().toString();
+    }
 
     public static SkinOption getSkinOption(File file) throws IOException {
         JsonObject json = GsonHelper.parse(Files.readString(file.toPath()));
