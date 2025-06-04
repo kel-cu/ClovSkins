@@ -48,7 +48,6 @@ public class ClovSkins implements ClientModInitializer {
     public static String cape;
 
     public static HashMap<String, ResourceLocation> cacheResourceLocations = new HashMap<>();
-//    public static SkinOption testSkinOption = new SkinOption("test", "https://s.namemc.com/i/1d83273316020155.png", "", PlayerSkin.Model.SLIM, URL, new File(getPath()+"/skins/test.alina.json"));
     public static SkinOption currentSkin = null;
     public static HashMap<String, SkinOption> skinOptions = new HashMap<>();
     public static VanillaLikeStyle vanillaLikeStyle = new VanillaLikeStyle();

@@ -1,5 +1,21 @@
 {
   "clovskins" : "ClovSkins",
+
+  "clovskins.config.main": "Основные настройки",
+  "clovskins.config.main.data": "Данные",
+  "clovskins.config.main.data.use_global": "Использовать общую папку для всех клиентов",
+  "clovskins.config.main.data.path": "Папка (Windows)",
+  "clovskins.config.main.data.path.unix": "Папка (UNIX)",
+  "clovskins.config.main.data.move": "Переместить данные из сборки в общую папку",
+  "clovskins.config.main.data.update_config": "Обновить конфиги",
+
+  "clovskins.config.menu": "Настройки меню",
+  "clovskins.config.menu.change_default_ui": "Изменить меню настройки персонажа",
+  "clovskins.config.menu.alinlib": "Использовать стиль AlinLib",
+  "clovskins.config.menu.two_one_slot": "Разделить линию выбора на два",
+  "clovskins.config.menu.title": "Кнопка в главном меню",
+  "clovskins.config.menu.pause": "Кнопка в меню паузы",
+
   "clovskins.main": "Это вы, %s!",
   "clovskins.main.select" : "Выбрать скин",
   "clovskins.main.options" : "Настройки игрока",
