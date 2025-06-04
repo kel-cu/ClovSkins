@@ -11,7 +11,7 @@ import ru.kelcuprum.clovskins.client.ClovSkins;
 public class MenuConfigs {
     public static Screen build(Screen parent){
         ConfigScreenBuilder screenBuilder = new ConfigScreenBuilder(parent, Component.literal("ClovSkins"));
-        screenBuilder.setCategoryTitle(Component.translatable("clovskins.configs.menu"));
+        screenBuilder.setCategoryTitle(Component.translatable("clovskins.config.menu"));
         screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.main"), (s) -> AlinLib.MINECRAFT.setScreen(MainConfigs.build(parent))));
         screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.menu"), (s) -> AlinLib.MINECRAFT.setScreen(MenuConfigs.build(parent))));
 
