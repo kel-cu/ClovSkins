@@ -150,7 +150,12 @@ public class ClovSkins implements ClientModInitializer {
                     ImageIO.write(image, "png", byteArrayOutputStream);
                     InputStream is = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
                     NativeImage nativeImage = NativeImage.read(is);
-                    DynamicTexture texture = new DynamicTexture(() -> name, nativeImage);
+                    DynamicTexture texture =
+                            //#if MC >= 12105
+                            new DynamicTexture(() -> name, nativeImage);
+                            //#else
+                            //$$ new DynamicTexture(nativeImage);
+                            //#endif
                     Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().register(location, texture));
                     ClovSkins.cacheResourceLocations.put(url, location);
                     capes.put(id, location);

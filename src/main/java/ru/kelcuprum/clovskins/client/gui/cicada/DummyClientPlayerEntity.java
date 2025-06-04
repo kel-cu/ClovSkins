@@ -49,7 +49,11 @@ public class DummyClientPlayerEntity extends LocalPlayer {
         this.options = null;
         this.equippedStackSupplier = (slot) -> ItemStack.EMPTY;
         this.setUUID(UUID.randomUUID());
-        Minecraft.getInstance().getSkinManager().getOrLoad(this.getGameProfile()).thenAccept((textures) -> this.skinTextures = textures.get());
+        Minecraft.getInstance().getSkinManager().getOrLoad(this.getGameProfile()).thenAccept((textures) -> this.skinTextures = textures
+                //#if MC >= 12105
+                .get()
+                //#endif
+        );
     }
 
     public DummyClientPlayerEntity(@Nullable Player player, UUID uuid, PlayerSkin skinTextures) {
