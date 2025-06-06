@@ -89,9 +89,14 @@ public class SkinPresetButton extends AbstractButton {
         try {
             if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, skinOption.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
             else entity.setSkin(skinOption.getPlayerSkin());
-            GuiEntityRenderer.drawEntity(
-                    guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height-30,
-                    size, rotation, followX, followY, entity
+//            GuiEntityRenderer.drawEntity(
+//                    guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height-30,
+//                    size, rotation, followX, followY, entity
+//            );
+
+            GuiEntityRenderer.drawModel(
+                    guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getBottom()-20,
+                    size, rotation, followX, followY, skinOption
             );
         } catch (Exception ignored){
             ignored.printStackTrace();

@@ -18,6 +18,7 @@ import ru.kelcuprum.clovskins.client.gui.screen.select.SelectSkinPreset;
 
 import java.util.UUID;
 
+import static com.mojang.blaze3d.Blaze3D.getTime;
 import static ru.kelcuprum.alinlib.gui.Colors.BLACK_ALPHA;
 import static ru.kelcuprum.alinlib.gui.Icons.EXIT;
 
@@ -54,16 +55,21 @@ public class MainScreen extends Screen {
     }
     public static DummyClientPlayerEntity entity;
     public static UUID SillyUUID = UUID.randomUUID();
+    public static double currentTime = getTime();
     public static void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size){
         PlayerSkin playerSkin = AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile());
-        float rotation = 360F * ((float) (System.currentTimeMillis() % 10000) / 10000);
+        float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
             if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
             else entity.setSkin(ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin());
             guiGraphics.pose().pushPose();
-            GuiEntityRenderer.drawEntity(
+//            GuiEntityRenderer.drawEntity(
+//                    guiGraphics.pose(), x + (size / 2), y+size*2,
+//                    size, rotation, 0, 0, entity
+//            );
+            GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), x + (size / 2), y+size*2,
-                    size, rotation, 0, 0, entity
+                    size, rotation, 0, 0, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin
             );
             guiGraphics.pose().popPose();
         } catch (Exception ignored){}
@@ -74,7 +80,7 @@ public class MainScreen extends Screen {
         super.render(guiGraphics, i, j, f);
         guiGraphics.drawCenteredString(font, Component.translatable("clovskins.main", FabricLoader.getInstance().isDevelopmentEnvironment() ? System.getProperty("user.name") : Player.getName()), width / 2, 10, -1);
         int playerHeight = (int) ((height - 20 - font.lineHeight - 30) * 0.8);
-        renderPlayer(guiGraphics, width/2-playerHeight/4, height/2-playerHeight/2, playerHeight/2);
+        renderPlayer(guiGraphics, width/2-playerHeight/4, height/2-playerHeight/2+10, playerHeight/2);
     }
 
     @Override

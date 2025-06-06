@@ -86,9 +86,13 @@ public class PlayerButton extends AbstractButton {
         try {
             if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin(), AlinLib.MINECRAFT.options, showItem);
             else entity.setSkin(ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin());
-            GuiEntityRenderer.drawEntity(
+//            GuiEntityRenderer.drawEntity(
+//                    guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height-25,
+//                    size, rotation, followX, followY, entity
+//            );
+            GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height-25,
-                    size, rotation, followX, followY, entity
+                    size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin
             );
         } catch (Exception ignored){}
         guiGraphics.pose().popPose();

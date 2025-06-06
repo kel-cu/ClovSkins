@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static com.mojang.blaze3d.Blaze3D.getTime;
 import static ru.kelcuprum.alinlib.gui.Colors.BLACK_ALPHA;
 import static ru.kelcuprum.alinlib.gui.Icons.DONT;
 import static ru.kelcuprum.clovskins.client.ClovSkins.getPath;
@@ -126,16 +127,20 @@ public class EditSkinPreset extends Screen {
 
     public DummyClientPlayerEntity entity;
     public UUID SillyUUID = UUID.randomUUID();
-
+    public double currentTime = getTime();
     public void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size){
-        float rotation = 360F * ((float) (System.currentTimeMillis() % 10000) / 10000);
+        float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
             if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, skinOption.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
             else entity.setSkin(skinOption.getPlayerSkin());
             guiGraphics.pose().pushPose();
-            GuiEntityRenderer.drawEntity(
-                    guiGraphics.pose(), x + (size / 2), y+size*2,
-                    size, rotation, 0, 0, entity
+//            GuiEntityRenderer.drawEntity(
+//                    guiGraphics.pose(), x + (size / 2), y+size*2,
+//                    size, rotation, 0, 0, entity
+//            );
+            GuiEntityRenderer.drawModel(
+                    guiGraphics.pose(), x + (size / 2), y+size*2+15,
+                    size, rotation, 0, 0, skinOption
             );
             guiGraphics.pose().popPose();
         } catch (Exception ignored){}

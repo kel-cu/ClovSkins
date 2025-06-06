@@ -248,7 +248,6 @@ public class SkinOption {
 
     public static SkinOption getSkinOption(File file) throws IOException {
         JsonObject json = GsonHelper.parse(Files.readString(file.toPath()));
-        ClovSkins.logger.log(json.toString());
         SkinType skinType = switch (getStringInJSON("type", json, "file")){
             case "url" -> SkinType.URL;
             case "nickname" -> SkinType.NICKNAME;
@@ -264,7 +263,6 @@ public class SkinOption {
         );
     }
     public static SkinOption getSkinOption(JsonObject json, File file) {
-        ClovSkins.logger.log(json.toString());
         SkinType skinType = switch (getStringInJSON("type", json, "file")){
             case "url" -> SkinType.URL;
             case "nickname" -> SkinType.NICKNAME;

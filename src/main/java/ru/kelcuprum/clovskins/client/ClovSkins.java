@@ -18,6 +18,7 @@ import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.AlinLogger;
 import ru.kelcuprum.alinlib.WebAPI;
 import ru.kelcuprum.alinlib.api.events.client.ClientLifecycleEvents;
+import ru.kelcuprum.alinlib.api.events.client.GuiRenderEvents;
 import ru.kelcuprum.alinlib.config.Config;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.info.Player;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import static ru.kelcuprum.alinlib.utils.GsonHelper.getStringInJSON;
+import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.NICKNAME;
 import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.URL;
 
 public class ClovSkins implements ClientModInitializer {
@@ -49,8 +51,11 @@ public class ClovSkins implements ClientModInitializer {
 
     public static HashMap<String, ResourceLocation> cacheResourceLocations = new HashMap<>();
     public static SkinOption currentSkin = null;
+    public static SkinOption safeSkinOption = new SkinOption("default", "MHF_Steve", "", PlayerSkin.Model.SLIM, NICKNAME, new File(getPath()+"/skins/safe.temp.json"));
     public static HashMap<String, SkinOption> skinOptions = new HashMap<>();
     public static VanillaLikeStyle vanillaLikeStyle = new VanillaLikeStyle();
+
+    public static float TICKS = 0;
 
     public static String getPath(){
         String path = pathConfig.getBoolean("USE_GLOBAL", false) ? (
@@ -70,6 +75,7 @@ public class ClovSkins implements ClientModInitializer {
         // Проверка и создание
         checkFolders();
         // Регистрация ивентов
+//        GuiRenderEvents.RENDER.register((guiGraphics, t) -> TICKS += (long) AlinLib.MINECRAFT.getDeltaTracker().getGameTimeDeltaPartialTick(true));
         ClientLifecycleEvents.CLIENT_FULL_STARTED.register((s) -> {
             defaultSkin = s.getSkinManager().getInsecureSkin(s.getGameProfile());
             try {
