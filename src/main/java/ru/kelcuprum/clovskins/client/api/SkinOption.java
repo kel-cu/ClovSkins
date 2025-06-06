@@ -164,6 +164,11 @@ public class SkinOption {
         else Files.writeString(file.toPath(), toString(), StandardCharsets.UTF_8);
     }
 
+    public void delete() throws IOException {
+        if(file == null) throw new RuntimeException("File == null");
+        else Files.delete(file.toPath());
+    }
+
     public void uploadToMojangAPI() throws IOException {
         if(Player.isLicenseAccount()){
             uploadSkinToMojangAPI();

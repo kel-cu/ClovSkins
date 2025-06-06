@@ -63,10 +63,6 @@ public class MainScreen extends Screen {
             if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
             else entity.setSkin(ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin());
             guiGraphics.pose().pushPose();
-//            GuiEntityRenderer.drawEntity(
-//                    guiGraphics.pose(), x + (size / 2), y+size*2,
-//                    size, rotation, 0, 0, entity
-//            );
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), x + (size / 2), y+size*2,
                     size, rotation, 0, 0, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin
@@ -80,7 +76,7 @@ public class MainScreen extends Screen {
         super.render(guiGraphics, i, j, f);
         guiGraphics.drawCenteredString(font, Component.translatable("clovskins.main", FabricLoader.getInstance().isDevelopmentEnvironment() ? System.getProperty("user.name") : Player.getName()), width / 2, 10, -1);
         int playerHeight = (int) ((height - 20 - font.lineHeight - 30) * 0.8);
-        renderPlayer(guiGraphics, width/2-playerHeight/4, height/2-playerHeight/2+10, playerHeight/2);
+        renderPlayer(guiGraphics, width/2-playerHeight/4, height/2-playerHeight/2+20, playerHeight/2);
     }
 
     @Override

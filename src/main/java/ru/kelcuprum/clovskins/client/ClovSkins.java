@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.AlinLogger;
@@ -21,6 +22,7 @@ import ru.kelcuprum.alinlib.api.events.client.ClientLifecycleEvents;
 import ru.kelcuprum.alinlib.api.events.client.GuiRenderEvents;
 import ru.kelcuprum.alinlib.config.Config;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
+import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.alinlib.info.Player;
 import ru.kelcuprum.alinlib.utils.GsonHelper;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
@@ -34,9 +36,13 @@ import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpRequest;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Objects;
 
+import static ru.kelcuprum.alinlib.gui.Icons.WARN;
+import static ru.kelcuprum.alinlib.gui.Icons.WARNING;
 import static ru.kelcuprum.alinlib.utils.GsonHelper.getStringInJSON;
 import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.NICKNAME;
 import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.URL;
@@ -58,7 +64,7 @@ public class ClovSkins implements ClientModInitializer {
     public static float TICKS = 0;
 
     public static String getPath(){
-        String path = pathConfig.getBoolean("USE_GLOBAL", false) ? (
+        String path = pathConfig.getBoolean("USE_GLOBAL", false) && !FabricLoader.getInstance().isDevelopmentEnvironment()? (
                 System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win") ?
                         pathConfig.getString("PATH", "{HOME}/ClovSkins") :
                         pathConfig.getString("PATH.UNIX", "/home/${USER}/ClovSkins")
@@ -84,6 +90,11 @@ public class ClovSkins implements ClientModInitializer {
                 exception.printStackTrace();
             }
             loadSkins();
+            if(FabricLoader.getInstance().isDevelopmentEnvironment()){
+                new ToastBuilder().setTitle(Component.translatable("clovskins"))
+                        .setMessage(Component.translatable("clovskins.warning.test_mode")).setIcon(WARNING)
+                        .setType(ToastBuilder.Type.WARN).setDisplayTime(10000).buildAndShow();
+            }
         });
     }
 
@@ -117,7 +128,7 @@ public class ClovSkins implements ClientModInitializer {
             defaultSkin.addProperty("type", "nickname");
             skinOptions.put("default", SkinOption.getSkinOption(defaultSkin, new File(getPath()+"/skins/default.json")));
         }
-        else skinOptions.put("default", new SkinOption(Player.getName(), defaultSkin, new File(getPath()+"/skins/default.json")));
+        else skinOptions.put("default", new SkinOption("Default skin", "MHF_Steve", "", PlayerSkin.Model.SLIM, NICKNAME, new File(getPath()+"/skins/default.json")));
         File skins = new File(getPath()+"/skins");
         if(!skins.exists() || !skins.isDirectory()) return;
         for(File file : skins.listFiles()){

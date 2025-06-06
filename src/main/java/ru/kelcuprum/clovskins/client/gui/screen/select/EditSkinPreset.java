@@ -9,12 +9,14 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
+import ru.kelcuprum.alinlib.gui.Icons;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.editbox.EditBoxBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.selector.SelectorBuilder;
 import ru.kelcuprum.alinlib.gui.components.buttons.Button;
 import ru.kelcuprum.alinlib.gui.components.editbox.EditBox;
 import ru.kelcuprum.alinlib.gui.components.selector.SelectorButton;
+import ru.kelcuprum.alinlib.gui.screens.ConfirmScreen;
 import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
@@ -36,6 +38,7 @@ public class EditSkinPreset extends Screen {
     public final SkinOption skinOptionOriginal;
     public String key;
     public boolean isSelected;
+    public boolean isDeleted = false;
     public EditSkinPreset(Screen screen, SkinOption skinOption, String key, Boolean isSelected) {
         super(Component.translatable("clovskins.edit"));
         this.parent = screen;
@@ -47,12 +50,13 @@ public class EditSkinPreset extends Screen {
 
     Button file;
     EditBox editBox;
-
+    SelectorButton selectorType;
     public static String[] skinTypes = new String[]{
             "nickname",
             "url",
             "file"
     };
+
 
     @Override
     protected void init() {
@@ -71,7 +75,7 @@ public class EditSkinPreset extends Screen {
             openTrackEditor();
         }).setSprite(GuiUtils.getResourceLocation("clovskins", "texture/icons/file.png")).setWidth(20).setPosition(x+componentSize+5, y).build());
         y+=25;
-        addRenderableWidget(new SelectorBuilder(Component.translatable("clovskins.edit.type")).setList(new String[] {
+        selectorType = (SelectorButton) addRenderableWidget(new SelectorBuilder(Component.translatable("clovskins.edit.type")).setList(new String[] {
             Component.translatable("clovskins.edit.type.nickname").getString(),
                 "URL",
                 "File"
@@ -82,13 +86,16 @@ public class EditSkinPreset extends Screen {
                 "Default",
                 "Slim"
         }).setOnPress((s) -> skinOption.model = s.getPosition() == 0 ? PlayerSkin.Model.WIDE : PlayerSkin.Model.SLIM).setValue(skinOption.model == PlayerSkin.Model.WIDE ? 0 : 1).setWidth(componentSize/2-2).setPosition(x+componentSize/2+2, y).build());
+        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.remove"), (s) -> {
+            AlinLib.MINECRAFT.setScreen(new ConfirmScreen(parent, Component.translatable("clovskins.edit.remove.title"), Component.translatable("clovskins.edit.remove.description"), (b) -> {
+                if(b){
+                    this.isDeleted = true;
+                    onClose();
+                }
+            }));
+        }).setSprite(DONT).setWidth(20).setPosition(x+componentSize+5, y).build());
         y+=25;
         addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.select_cape"), (s) -> AlinLib.MINECRAFT.setScreen(new SelectCape(AlinLib.MINECRAFT.screen, skinOption, key))).setWidth(componentSize).setPosition(x, y).build());
-
-        // --------------------
-        // -------------------- -
-        // --------- ----------
-        // --------------------
     }
 
     public void openTrackEditor(){
@@ -106,7 +113,11 @@ public class EditSkinPreset extends Screen {
         String result = TinyFileDialogs.tinyfd_openFileDialog(Component.translatable("clovskins.edit.file_selector").getString(), defaultString, filters, Component.translatable("clovskins.edit.file_selector.description").getString(), false);
         if(result == null) return;
         File file = new File(result);
-        if(file.exists()) editBox.setValue(file.getAbsolutePath());
+        if(file.exists()) {
+            editBox.setValue(file.getAbsolutePath());
+            skinOption.type = SkinOption.SkinType.FILE;
+            selectorType.setPosition(2);
+        }
         else new ToastBuilder().setIcon(DONT).setType(ToastBuilder.Type.ERROR).setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.edit.file_not_exist")).buildAndShow();
     }
 
@@ -134,10 +145,6 @@ public class EditSkinPreset extends Screen {
             if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, skinOption.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
             else entity.setSkin(skinOption.getPlayerSkin());
             guiGraphics.pose().pushPose();
-//            GuiEntityRenderer.drawEntity(
-//                    guiGraphics.pose(), x + (size / 2), y+size*2,
-//                    size, rotation, 0, 0, entity
-//            );
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), x + (size / 2), y+size*2+15,
                     size, rotation, 0, 0, skinOption
@@ -149,22 +156,31 @@ public class EditSkinPreset extends Screen {
     @Override
     public void tick() {
         super.tick();
-        file.active = skinOption.type == SkinOption.SkinType.FILE;
     }
 
     @Override
     public void onClose() {
-        if(minecraft == null) return;
         try {
-            skinOption.save();
-            if(ClovSkins.currentSkin == skinOptionOriginal) {
-                if(!skinOption.equals(skinOptionOriginal)) skinOption.uploadToMojangAPI();
-                ClovSkins.currentSkin = skinOption;
+            if(isDeleted){
+                if(ClovSkins.currentSkin == skinOptionOriginal) {
+                    ClovSkins.currentSkin = ClovSkins.skinOptions.getOrDefault("default", ClovSkins.safeSkinOption);
+                    ClovSkins.config.setString("SELECTED", "default");
+                    ClovSkins.currentSkin.uploadToMojangAPI();
+                }
+                skinOption.delete();
+                ClovSkins.skinOptions.remove(key);
+                AlinLib.MINECRAFT.setScreen(parent);
+            } else {
+                skinOption.save();
+                if(ClovSkins.currentSkin == skinOptionOriginal) {
+                    if(!skinOption.equals(skinOptionOriginal)) skinOption.uploadToMojangAPI();
+                    ClovSkins.currentSkin = skinOption;
+                }
+                ClovSkins.skinOptions.put(key, skinOption);
             }
-            ClovSkins.skinOptions.put(key, skinOption);
         } catch (Exception exception){
             exception.printStackTrace();
         }
-        minecraft.setScreen(parent);
+        AlinLib.MINECRAFT.setScreen(parent);
     }
 }

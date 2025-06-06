@@ -53,7 +53,7 @@ public class CreateSkin extends Screen {
         if(ResourceLocation.isValidPath(name)){
             File file = new File(getPath()+"/skins/"+name+".json");
             try {
-                Files.writeString(file.toPath(), ClovSkins.skinOptions.get("default").toString(), StandardCharsets.UTF_8);
+                Files.writeString(file.toPath(), ClovSkins.safeSkinOption.toString(), StandardCharsets.UTF_8);
                 SkinOption skinOption = SkinOption.getSkinOption(file);
                 ClovSkins.skinOptions.put(name, skinOption);
                 AlinLib.MINECRAFT.setScreen(new EditSkinPreset(parent, skinOption, name, false));
