@@ -81,7 +81,6 @@ public class ClovSkins implements ClientModInitializer {
         // Проверка и создание
         checkFolders();
         // Регистрация ивентов
-//        GuiRenderEvents.RENDER.register((guiGraphics, t) -> TICKS += (long) AlinLib.MINECRAFT.getDeltaTracker().getGameTimeDeltaPartialTick(true));
         ClientLifecycleEvents.CLIENT_FULL_STARTED.register((s) -> {
             defaultSkin = s.getSkinManager().getInsecureSkin(s.getGameProfile());
             try {
