@@ -115,7 +115,7 @@ public class SkinPresetButton extends AbstractButton {
     public void onClick(double d, double e) {
         if(e <= getBottom()-20) {
             if(ClovSkins.currentSkin == skinOption){
-                ClovSkins.logger.log("Скин уже поставлен");
+                ClovSkins.logger.log("Skin is already set");
             } else {
                 try {
                     skinOption.uploadToMojangAPI();

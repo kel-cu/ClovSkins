@@ -5,15 +5,15 @@
 
   "clovskins.config.main": "Main configs",
   "clovskins.config.main.data": "Data",
-  "clovskins.config.main.data.use_global": "Use a shared folder for all clients",
+  "clovskins.config.main.data.use_global": "Use a shared folder for all instances",
   "clovskins.config.main.data.path": "Folder (Windows)",
   "clovskins.config.main.data.path.unix": "Folder (UNIX)",
-  "clovskins.config.main.data.move": "Move data from an assembly to a shared folder",
-  "clovskins.config.main.data.update_config": "Update the configs",
+  "clovskins.config.main.data.move": "Move data from an instance to a shared folder",
+  "clovskins.config.main.data.update_config": "Update configs",
 
   "clovskins.config.menu": "Menu settings",
   "clovskins.config.menu.change_default_ui": "Change the character customization menu",
-  "clovskins.config.menu.alinlib": "Use the AlinLib style",
+  "clovskins.config.menu.alinlib": "Use AlinLib style",
   "clovskins.config.menu.two_one_slot": "Split the choice line into two",
   "clovskins.config.menu.title": "Button in the main menu",
   "clovskins.config.menu.pause": "Button in the pause menu",
@@ -26,7 +26,7 @@
   "clovskins.main": "It's you, %s!",
   "clovskins.main.select" : "Select skin",
   "clovskins.main.options" : "Player options",
-  "clovskins.main.configs" : "Mod setting",
+  "clovskins.main.configs" : "Mod settings",
 
   "clovskins.select": "Your skins",
   "clovskins.select.edit": "Edit",
@@ -36,7 +36,7 @@
 
   "clovskins.edit": "Edit skin",
   "clovskins.edit.name": "Name",
-  "clovskins.edit.url": "URL/Path file",
+  "clovskins.edit.url": "URL/File path",
   "clovskins.edit.file_select": "Select file",
   "clovskins.edit.type": "Type",
   "clovskins.edit.type.nickname": "Nickname",
@@ -44,15 +44,15 @@
   "clovskins.edit.select_cape": "Select cape",
 
   "clovskins.edit.file_selector": "Select skin file",
-  "clovskins.edit.file_selector.description": "Skin fule (.png)",
-  "clovskins.edit.file_not_exist": "File not exists!",
+  "clovskins.edit.file_selector.description": "Skin file (.png)",
+  "clovskins.edit.file_not_exist": "File doesn't exist!",
 
   "clovskins.edit.remove": "Remove skin",
-  "clovskins.edit.remove.title": "Are you sure you want to remove the skin?",
-  "clovskins.edit.remove.description": "These skin settings will be lost and there is no way to get them back!",
+  "clovskins.edit.remove.title": "Are you sure you want to remove that skin?",
+  "clovskins.edit.remove.description": "Skin settings will be lost and there is no way to get them back!",
 
   "clovskins.upload.done": "Your skin %s has been successfully uploaded!",
-  "clovskins.upload.multiplayer": "In order for players of this server to see your wonderful skin, then you will have to re-enter the server!",
+  "clovskins.upload.multiplayer": "In order for players on this server to see your wonderful skin, you'll have to rejoin the server!",
 
   "clovskins.open_gui": "Skins"
 }

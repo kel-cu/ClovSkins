@@ -105,7 +105,7 @@ public class ClovSkins implements ClientModInitializer {
                 Files.createDirectories(file.toPath());
             } catch (Exception exception){
                 exception.printStackTrace();
-                AlinLib.MINECRAFT.delayCrash(new CrashReport("Произошла ошибка создании папки", exception.getCause()));
+                AlinLib.MINECRAFT.delayCrash(new CrashReport("Exception while creating a folder", exception.getCause()));
             }
         }
         if(!fileTemo.exists()) {
@@ -113,7 +113,7 @@ public class ClovSkins implements ClientModInitializer {
                 Files.createDirectories(fileTemo.toPath());
             } catch (Exception exception){
                 exception.printStackTrace();
-                AlinLib.MINECRAFT.delayCrash(new CrashReport("Произошла ошибка создании папки", exception.getCause()));
+                AlinLib.MINECRAFT.delayCrash(new CrashReport("Exception while creating a folder", exception.getCause()));
             }
         }
     }
@@ -135,7 +135,7 @@ public class ClovSkins implements ClientModInitializer {
                 try {
                     skinOptions.put(file.getName().substring(0, file.getName().length()-5), SkinOption.getSkinOption(file));
                 } catch (Exception ex){
-                    logger.log("Ошибка загрузки файла");
+                    logger.log("Error during file load");
                     ex.printStackTrace();
                 }
             }
