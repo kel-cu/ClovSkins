@@ -104,7 +104,7 @@ public class SkinOption {
         if(image == null){
             return null;
         }
-        if(image.getWidth() > 64 || image.getHeight() > 64) throw new RuntimeException("Разрешение скина больше допустимой!");
+        if(image.getWidth() > 64 || image.getHeight() > 64) throw new RuntimeException("Too high skin resolution!");
         return image;
     }
 
