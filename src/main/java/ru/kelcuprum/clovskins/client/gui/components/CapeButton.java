@@ -3,25 +3,15 @@ package ru.kelcuprum.clovskins.client.gui.components;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.storage.loot.functions.FillPlayerHead;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.styles.AbstractStyle;
-import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
-import ru.kelcuprum.clovskins.client.gui.cicada.DummyClientPlayerEntity;
-import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
-import ru.kelcuprum.clovskins.client.gui.screen.select.EditSkinPreset;
-
-import java.util.UUID;
-
-import static com.mojang.blaze3d.Blaze3D.getTime;
 
 public class CapeButton extends AbstractButton {
     int size;

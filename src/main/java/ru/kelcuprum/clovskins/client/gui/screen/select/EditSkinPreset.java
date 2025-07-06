@@ -9,7 +9,6 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
-import ru.kelcuprum.alinlib.gui.Icons;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.editbox.EditBoxBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.selector.SelectorBuilder;
@@ -20,12 +19,10 @@ import ru.kelcuprum.alinlib.gui.screens.ConfirmScreen;
 import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
-import ru.kelcuprum.clovskins.client.gui.cicada.DummyClientPlayerEntity;
 import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.UUID;
 
 import static com.mojang.blaze3d.Blaze3D.getTime;
 import static ru.kelcuprum.alinlib.gui.Colors.BLACK_ALPHA;
@@ -136,14 +133,10 @@ public class EditSkinPreset extends Screen {
         guiGraphics.pose().popPose();
     }
 
-    public DummyClientPlayerEntity entity;
-    public UUID SillyUUID = UUID.randomUUID();
     public double currentTime = getTime();
     public void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
-            if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, skinOption.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
-            else entity.setSkin(skinOption.getPlayerSkin());
             guiGraphics.pose().pushPose();
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), x + (size / 2), y+size*2+15,

@@ -2,8 +2,6 @@ package ru.kelcuprum.clovskins.client.api;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.nimbusds.common.contenttype.ContentType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -20,7 +18,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import ru.kelcuprum.alinlib.AlinLib;
-import ru.kelcuprum.alinlib.WebAPI;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.alinlib.info.Player;
@@ -84,13 +81,15 @@ public class SkinOption {
             ImageIO.write(image, "png", byteArrayOutputStream);
             InputStream is = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
             NativeImage nativeImage = NativeImage.read(is);
-            DynamicTexture texture =
-                    //#if MC >= 12105
-                    new DynamicTexture(() -> name, nativeImage);
-            //#else
-            //$$ new DynamicTexture(nativeImage);
-            //#endif
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().register(location, texture));
+            Minecraft.getInstance().execute(() -> {
+                DynamicTexture texture =
+                        //#if MC >= 12105
+                        new DynamicTexture(() -> name, nativeImage);
+                //#else
+                //$$ new DynamicTexture(nativeImage);
+                //#endif
+                Minecraft.getInstance().getTextureManager().register(location, texture);
+            });
             ClovSkins.cacheResourceLocations.put(skin, location);
         }
         return location;

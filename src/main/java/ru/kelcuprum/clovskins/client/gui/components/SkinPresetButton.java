@@ -1,30 +1,19 @@
 package ru.kelcuprum.clovskins.client.gui.components;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
-import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.gui.styles.AbstractStyle;
 import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
-import ru.kelcuprum.clovskins.client.gui.cicada.DummyClientPlayerEntity;
 import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
-import ru.kelcuprum.clovskins.client.gui.screen.MainScreen;
 import ru.kelcuprum.clovskins.client.gui.screen.select.EditSkinPreset;
-
-import java.util.UUID;
 
 import static com.mojang.blaze3d.Blaze3D.getTime;
 
@@ -56,9 +45,6 @@ public class SkinPresetButton extends AbstractButton {
         return rotation;
     }
 
-    public UUID SillyUUID = UUID.randomUUID();
-    public DummyClientPlayerEntity entity;
-
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         AbstractStyle style = GuiUtils.getSelected();
@@ -87,8 +73,6 @@ public class SkinPresetButton extends AbstractButton {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0, 0, 950.0);
         try {
-            if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, skinOption.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
-            else entity.setSkin(skinOption.getPlayerSkin());
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getBottom()-20,
                     size, rotation, followX, followY, skinOption

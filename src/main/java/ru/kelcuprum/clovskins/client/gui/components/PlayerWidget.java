@@ -9,10 +9,7 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.clovskins.client.ClovSkins;
-import ru.kelcuprum.clovskins.client.gui.cicada.DummyClientPlayerEntity;
 import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
-
-import java.util.UUID;
 
 import static com.mojang.blaze3d.Blaze3D.getTime;
 
@@ -55,8 +52,6 @@ public class PlayerWidget extends AbstractButton {
     public void setRotation(float rotation){
         this.rotation = rotation;
     }
-    public static UUID SillyUUID = UUID.randomUUID();
-    public DummyClientPlayerEntity entity;
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
             PlayerSkin playerSkin = AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile());
@@ -72,8 +67,6 @@ public class PlayerWidget extends AbstractButton {
 
             guiGraphics.pose().pushPose();
             try {
-                if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin(), AlinLib.MINECRAFT.options, showItem);
-                else entity.setSkin(ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin());
                 GuiEntityRenderer.drawModel(
                         guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height+10,
                         size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin

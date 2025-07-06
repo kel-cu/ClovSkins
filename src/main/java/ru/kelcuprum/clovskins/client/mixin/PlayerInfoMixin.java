@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import static ru.kelcuprum.clovskins.client.ClovSkins.getPath;
 import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.URL;
 
-@Mixin(PlayerInfo.class)
+@Mixin(value = PlayerInfo.class)
 public class PlayerInfoMixin {
     @Inject(method = "createSkinLookup", at=@At("RETURN"), cancellable = true)
     private static void createSkinLookup(GameProfile gameProfile, CallbackInfoReturnable<Supplier<PlayerSkin>> cir){

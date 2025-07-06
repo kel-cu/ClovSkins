@@ -16,7 +16,7 @@ import ru.kelcuprum.clovskins.client.mixin.AccessorGridLayout;
 
 import java.util.List;
 
-@Mixin(PauseScreen.class)
+@Mixin(value = PauseScreen.class, priority = Integer.MAX_VALUE)
 public class PauseScreenMixin extends Screen {
 
     protected PauseScreenMixin(Component component) {
@@ -28,15 +28,14 @@ public class PauseScreenMixin extends Screen {
         if(ClovSkins.config.getBoolean("MENU.PAUSE", true)){
             if (gridLayout != null) {
                 final List<AbstractWidget> buttons = ((AccessorGridLayout) gridLayout).getChildren();
-                int vanillaButtonsY = this.height / 4 + 72 - 16 + 1;
-                int vanillaButtonsX = 0;
+                boolean isLeft = ClovSkins.config.getBoolean("MENU.PAUSE.LEFT", false);
+                int x =  isLeft ? width : 0;
+                int y = this.height / 4 + 72 - 16 + 1;
                 for (AbstractWidget widget : buttons) {
-                    if (widget.getMessage().contains(Component.translatable("menu.returnToMenu")) || widget.getMessage().contains(Component.translatable("menu.disconnect"))) {
-                        vanillaButtonsY = widget.getY();
-                        vanillaButtonsX = widget.getRight() + 30;
-                    }
+                    x = isLeft ? Math.min(x, widget.getX() - 55) : Math.max(x, widget.getRight()+5);
+                    y = Math.max(y, widget.getY());
                 }
-                buttons.add(new PlayerButton(vanillaButtonsX, vanillaButtonsY-100, 50));
+                buttons.add(new PlayerButton(x, y-100, 50));
             }
         }
     }

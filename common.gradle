@@ -71,7 +71,7 @@ dependencies {
     }
     // Music
     implementation("meteordevelopment:starscript:0.3.4")
-    include modImplementation("maven.modrinth:cicada:${project.cicada_version}")
+//    include modImplementation("maven.modrinth:cicada:${project.cicada_version}")
     modCompileOnly("maven.modrinth:entitytexturefeatures:${project.etf_version}")
 
     include group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.10'

@@ -10,13 +10,10 @@ import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.info.Player;
 import ru.kelcuprum.clovskins.client.ClovSkins;
-import ru.kelcuprum.clovskins.client.gui.cicada.DummyClientPlayerEntity;
 import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
 import ru.kelcuprum.clovskins.client.gui.components.PlayerWidget;
 import ru.kelcuprum.clovskins.client.gui.screen.config.MainConfigs;
 import ru.kelcuprum.clovskins.client.gui.screen.select.SelectSkinPreset;
-
-import java.util.UUID;
 
 import static com.mojang.blaze3d.Blaze3D.getTime;
 import static ru.kelcuprum.alinlib.gui.Colors.BLACK_ALPHA;
@@ -53,15 +50,11 @@ public class MainScreen extends Screen {
         super.renderBackground(guiGraphics, i, j, f);
         guiGraphics.fill(0, 0, width, height, BLACK_ALPHA);
     }
-    public static DummyClientPlayerEntity entity;
-    public static UUID SillyUUID = UUID.randomUUID();
     public static double currentTime = getTime();
     public static void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size){
         PlayerSkin playerSkin = AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile());
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
-            if(entity == null) entity = new DummyClientPlayerEntity(null, SillyUUID, ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin(), AlinLib.MINECRAFT.options, false);
-            else entity.setSkin(ClovSkins.currentSkin == null ? playerSkin : ClovSkins.currentSkin.getPlayerSkin());
             guiGraphics.pose().pushPose();
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), x + (size / 2), y+size*2,

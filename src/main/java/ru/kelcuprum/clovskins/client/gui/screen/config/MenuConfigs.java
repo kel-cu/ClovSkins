@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBooleanBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
+import ru.kelcuprum.alinlib.gui.components.builder.text.HorizontalRuleBuilder;
 import ru.kelcuprum.alinlib.gui.screens.ConfigScreenBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 
@@ -18,8 +19,12 @@ public class MenuConfigs {
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.change_default_ui"), true).setConfig(ClovSkins.config, "MENU.CHANGE_DEFAULT_UI"));
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.alinlib"), false).setConfig(ClovSkins.config, "MENU.ALINLIB"));
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.two_one_slot"), true).setConfig(ClovSkins.config, "MENU.TWO_ONE_SLOT"));
+        screenBuilder.addWidget(new HorizontalRuleBuilder());
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.title"), true).setConfig(ClovSkins.config, "MENU.TITLE"));
+        screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.title.left"), false).setConfig(ClovSkins.config, "MENU.TITLE.LEFT"));
+        screenBuilder.addWidget(new HorizontalRuleBuilder());
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.pause"), true).setConfig(ClovSkins.config, "MENU.PAUSE"));
+        screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.pause.left"), false).setConfig(ClovSkins.config, "MENU.PAUSE.LEFT"));
         return screenBuilder.build();
     }
 }

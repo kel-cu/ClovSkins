@@ -1,9 +1,7 @@
 package ru.kelcuprum.clovskins.client.mixin.gui;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -21,27 +19,26 @@ import ru.kelcuprum.clovskins.client.mixin.AccessorGridLayout;
 
 import java.util.List;
 
-@Mixin(TitleScreen.class)
+@Mixin(value = TitleScreen.class, priority = Integer.MAX_VALUE)
 public class TitleScreenMixin extends Screen {
 
     protected TitleScreenMixin(Component component) {
         super(component);
     }
 
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "init", at = @At("RETURN"))
     void createPauseMenu(CallbackInfo ci) {
         if(ClovSkins.config.getBoolean("MENU.TITLE", true)) {
-            int x = 0;
+            boolean isLeft = ClovSkins.config.getBoolean("MENU.TITLE.LEFT", false);
+            int x =  isLeft ? width : 0;
             int y = 0;
             for (GuiEventListener widget : this.children) {
-                if (widget instanceof SpriteIconButton) {
-                    if (((SpriteIconButton) widget).sprite.equals(GuiUtils.getResourceLocation("icon/accessibility"))) {
-                        x = ((AbstractWidget) widget).getRight() + 5;
-                        y = ((AbstractWidget) widget).getY();
-                    }
+                if (widget instanceof Button && !(widget instanceof PlainTextButton)) {
+                    x = isLeft ? Math.min(x, ((AbstractWidget) widget).getX() - 55) : Math.max(x, ((AbstractWidget) widget).getRight()+5);
+                    y = Math.max(y, ((AbstractWidget) widget).getY());
                 }
             }
-            addRenderableWidget(new PlayerButton(x, y - 88, 50));
+            addRenderableWidget(new PlayerButton(x, y - 100, 50));
         }
     }
 }
