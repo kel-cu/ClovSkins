@@ -11,7 +11,6 @@ import ru.kelcuprum.alinlib.gui.components.VerticalConfigureScrolWidget;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
-import ru.kelcuprum.clovskins.client.gui.components.CapeButton;
 import ru.kelcuprum.clovskins.client.gui.components.SkinPresetButton;
 
 import java.util.ArrayList;
@@ -36,7 +35,6 @@ public class SelectSkinPreset extends Screen {
         int heightComponent = height - 60 - font.lineHeight - 10;
         if(ClovSkins.config.getBoolean("MENU.TWO_ONE_SLOT", true)) heightComponent = (heightComponent-4) / 2;
         int widthComponent = heightComponent / 2 + 20;
-        int x = 5;
         this.scroller_pages = addRenderableWidget(new VerticalConfigureScrolWidget(0,  27+font.lineHeight, width, 3, Component.empty(), scroller -> {
             scroller.innerHeight = 5;
             int y = 35 + font.lineHeight;

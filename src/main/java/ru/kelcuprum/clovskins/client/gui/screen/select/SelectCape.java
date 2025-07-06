@@ -12,7 +12,6 @@ import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
 import ru.kelcuprum.clovskins.client.gui.components.CapeButton;
 import ru.kelcuprum.clovskins.client.gui.components.NonCapeButton;
-import ru.kelcuprum.clovskins.client.gui.components.SkinPresetButton;
 
 import java.util.ArrayList;
 import java.util.List;

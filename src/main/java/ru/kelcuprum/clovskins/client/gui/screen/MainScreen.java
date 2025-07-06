@@ -3,7 +3,6 @@ package ru.kelcuprum.clovskins.client.gui.screen;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import ru.kelcuprum.alinlib.AlinLib;
@@ -51,14 +50,13 @@ public class MainScreen extends Screen {
         guiGraphics.fill(0, 0, width, height, BLACK_ALPHA);
     }
     public static double currentTime = getTime();
-    public static void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size){
-        PlayerSkin playerSkin = AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile());
+    public static void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size, float tick){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
             guiGraphics.pose().pushPose();
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), x + (size / 2), y+size*2,
-                    size, rotation, 0, 0, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin
+                    size, rotation, 0, 0, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, tick
             );
             guiGraphics.pose().popPose();
         } catch (Exception ignored){}
@@ -69,7 +67,7 @@ public class MainScreen extends Screen {
         super.render(guiGraphics, i, j, f);
         guiGraphics.drawCenteredString(font, Component.translatable("clovskins.main", FabricLoader.getInstance().isDevelopmentEnvironment() ? System.getProperty("user.name") : Player.getName()), width / 2, 10, -1);
         int playerHeight = (int) ((height - 20 - font.lineHeight - 30) * 0.8);
-        renderPlayer(guiGraphics, width/2-playerHeight/4, height/2-playerHeight/2+20, playerHeight/2);
+        renderPlayer(guiGraphics, width/2-playerHeight/4, height/2-playerHeight/2+20, playerHeight/2, f);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package ru.kelcuprum.clovskins.client.gui.screen;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;

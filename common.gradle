@@ -88,7 +88,7 @@ dependencies {
         modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
         modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
         modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-        modImplementation "ru.kelcuprum:AlinLib-fabric:${rootProject.alinlib}+mc${project.minecraft_version}"
+        modImplementation "ru.kelcuprum:AlinLib-fabric:${rootProject.alinlib}+mc${project.minecraft_version_alinlib}"
     }
 
     subprojects.each {

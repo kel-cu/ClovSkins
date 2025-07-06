@@ -69,7 +69,7 @@ public class PlayerWidget extends AbstractButton {
             try {
                 GuiEntityRenderer.drawModel(
                         guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height+10,
-                        size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin
+                        size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, partialTicks
                 );
             } catch (Exception ignored){}
             guiGraphics.pose().popPose();

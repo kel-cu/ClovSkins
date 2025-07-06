@@ -1,7 +1,6 @@
 package ru.kelcuprum.clovskins.client.mixin;
 
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.PlayerSkin;
@@ -11,14 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.clovskins.client.ClovSkins;
-import ru.kelcuprum.clovskins.client.api.SkinOption;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.function.Supplier;
-
-import static ru.kelcuprum.clovskins.client.ClovSkins.getPath;
-import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.URL;
 
 @Mixin(value = PlayerInfo.class)
 public class PlayerInfoMixin {

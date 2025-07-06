@@ -75,10 +75,10 @@ public class SkinPresetButton extends AbstractButton {
         try {
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getBottom()-20,
-                    size, rotation, followX, followY, skinOption
+                    size, rotation, followX, followY, skinOption, partialTicks
             );
-        } catch (Exception ignored){
-            ignored.printStackTrace();
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
         guiGraphics.pose().translate(0, 0, -950.0);
         guiGraphics.pose().popPose();

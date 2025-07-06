@@ -128,19 +128,19 @@ public class EditSkinPreset extends Screen {
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0, 0, 1900.0);
-        renderPlayer(guiGraphics, 15, height/2-playerHeight/2, playerHeight/2);
+        renderPlayer(guiGraphics, 15, height/2-playerHeight/2, playerHeight/2, f);
         guiGraphics.pose().translate(0, 0, -1900.0);
         guiGraphics.pose().popPose();
     }
 
     public double currentTime = getTime();
-    public void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size){
+    public void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size, float tick){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
             guiGraphics.pose().pushPose();
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), x + (size / 2), y+size*2+15,
-                    size, rotation, 0, 0, skinOption
+                    size, rotation, 0, 0, skinOption, tick
             );
             guiGraphics.pose().popPose();
         } catch (Exception ignored){}

@@ -37,7 +37,7 @@ public class CapeButton extends AbstractButton {
         AbstractStyle style = GuiUtils.getSelected();
         style.renderBackground$widget(guiGraphics, getX(), getY(), width, height, active, isHovered);
         if (GuiUtils.isDoesNotFit(Component.literal(name), width, 20))
-            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(name), 2 , style.getTextColor(active), getY(), getY()+20);
+            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(name), style.getTextColor(active), getY(), getY()+20);
         else GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(name), getX()+width/2, getY()+7, style.getTextColor(active), true);
         if(skinOption.cape.equals(key)) guiGraphics.blit(RenderType::guiTextured, GuiUtils.getResourceLocation("textures/gui/sprites/icon/checkmark.png"), getRight()-14, getY()+5, 0f, 0f, 9, 8, 9, 8);
         int capeWidth = size / 16 * 10;
@@ -50,9 +50,9 @@ public class CapeButton extends AbstractButton {
         renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getBottom()-20, l, this.getBottom(), j);
     }
 
-    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, Component msg, int i, int j, int y, int bottom) {
-        int k = this.getX() + i;
-        int l = this.getX() + this.getWidth() - i;
+    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, Component msg, int j, int y, int bottom) {
+        int k = this.getX() + 2;
+        int l = this.getX() + this.getWidth() - 2;
         renderScrollingString(guiGraphics, font, msg, k, y, l, bottom, j);
     }
 

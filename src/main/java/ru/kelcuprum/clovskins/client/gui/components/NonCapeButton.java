@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.styles.AbstractStyle;
@@ -33,7 +32,7 @@ public class NonCapeButton extends AbstractButton {
         AbstractStyle style = GuiUtils.getSelected();
         style.renderBackground$widget(guiGraphics, getX(), getY(), width, height, active, isHovered);
         if (GuiUtils.isDoesNotFit(getMessage(), width, 20))
-            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), 2, style.getTextColor(active), getY(), getY() + 20);
+            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), style.getTextColor(active), getY(), getY() + 20);
         else
             GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), getX() + width / 2, getY() + 7, style.getTextColor(active), true);
         if(skinOption.cape.isBlank()) guiGraphics.blit(RenderType::guiTextured, GuiUtils.getResourceLocation("textures/gui/sprites/icon/checkmark.png"), getRight()-14, getY()+5, 0f, 0f, 9, 8, 9, 8);
@@ -46,9 +45,9 @@ public class NonCapeButton extends AbstractButton {
         renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getBottom() - 20, l, this.getBottom(), j);
     }
 
-    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, Component msg, int i, int j, int y, int bottom) {
-        int k = this.getX() + i;
-        int l = this.getX() + this.getWidth() - i;
+    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, Component msg, int j, int y, int bottom) {
+        int k = this.getX() + 2;
+        int l = this.getX() + this.getWidth() - 2;
         renderScrollingString(guiGraphics, font, msg, k, y, l, bottom, j);
     }
 

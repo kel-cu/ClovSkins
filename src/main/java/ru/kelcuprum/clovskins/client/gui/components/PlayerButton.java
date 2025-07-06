@@ -1,7 +1,5 @@
 package ru.kelcuprum.clovskins.client.gui.components;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -77,7 +75,7 @@ public class PlayerButton extends AbstractButton {
         try {
             GuiEntityRenderer.drawModel(
                     guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height-25,
-                    size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin
+                    size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, partialTicks
             );
         } catch (Exception ignored){}
         guiGraphics.pose().popPose();
@@ -94,21 +92,9 @@ public class PlayerButton extends AbstractButton {
         renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getBottom()-20, l, this.getY() + this.getHeight(), j);
     }
 
-    OnPress onPress;
-
-    public void setOnPress(OnPress onPress) {
-        this.onPress = onPress;
-        if (onPress != null) active = true;
-    }
-
     @Override
     public void onPress() {
         AlinLib.MINECRAFT.setScreen(new MainScreen(AlinLib.MINECRAFT.screen));
-    }
-
-    @Environment(EnvType.CLIENT)
-    public interface OnPress {
-        void onPress(PlayerButton button);
     }
 
     @Override
