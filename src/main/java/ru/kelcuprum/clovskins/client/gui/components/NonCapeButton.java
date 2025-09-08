@@ -4,6 +4,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+//#if MC >= 12106
+import net.minecraft.client.renderer.RenderPipelines;
+//#endif
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import ru.kelcuprum.alinlib.AlinLib;
@@ -35,8 +38,20 @@ public class NonCapeButton extends AbstractButton {
             renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), style.getTextColor(active), getY(), getY() + 20);
         else
             GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), getX() + width / 2, getY() + 7, style.getTextColor(active), true);
-        if(skinOption.cape.isBlank()) guiGraphics.blit(RenderType::guiTextured, GuiUtils.getResourceLocation("textures/gui/sprites/icon/checkmark.png"), getRight()-14, getY()+5, 0f, 0f, 9, 8, 9, 8);
-        guiGraphics.blit(RenderType::guiTextured, DONT, getX() + getWidth() / 2 - 20, getY() + getHeight() / 2 - 20, 0, 0, 40, 40, 40, 40);
+        if(skinOption.cape.isBlank()) guiGraphics.blit(
+                        //#if MC >= 12106
+                        RenderPipelines.GUI_TEXTURED,
+                        //#elseif MC >= 12102
+                        //$$ RenderType::guiTextured,
+                        //#endif
+                         GuiUtils.getResourceLocation("textures/gui/sprites/icon/checkmark.png"), getRight()-14, getY()+5, 0f, 0f, 9, 8, 9, 8);
+        guiGraphics.blit(
+                        //#if MC >= 12106
+                        RenderPipelines.GUI_TEXTURED,
+                        //#elseif MC >= 12102
+                        //$$ RenderType::guiTextured,
+                        //#endif
+                         DONT, getX() + getWidth() / 2 - 20, getY() + getHeight() / 2 - 20, 0, 0, 40, 40, 40, 40);
     }
 
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {

@@ -1,5 +1,6 @@
 package ru.kelcuprum.clovskins.client.gui.components;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
@@ -7,6 +8,9 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionfc;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
@@ -58,21 +62,51 @@ public class PlayerWidget extends AbstractButton {
             int scale = size/45;
             float followX = (float) (this.getX() + (this.getWidth() / 2)) - mouseX;
             float followY = (float) (((float) (this.getY() + (this.height/2.5)) - mouseY)-(7.5*scale*AlinLib.MINECRAFT.options.guiScale().get()));
-            float rotation = 0;
+            float rotation =
+                    //#if MC <= 12105
+                    //$$ 0f
+                    //#else
+                    180f
+                    //#endif
+            ;
             if(!followMouse) followX = followY = 0;
             if(rotate){
                 followX = followY = 0;
                 rotation = getRotation();
             }
 
-            guiGraphics.pose().pushPose();
-            try {
-                GuiEntityRenderer.drawModel(
-                        guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height+10,
-                        size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, partialTicks
-                );
-            } catch (Exception ignored){}
-            guiGraphics.pose().popPose();
+        //#if MC <= 12105
+        //$$ guiGraphics.pose().pushPose();
+        //#else
+        Matrix3x2f matrix3x2f = guiGraphics.pose().pushMatrix();
+        PoseStack pose = new PoseStack();
+        //#endif
+        try {
+            GuiEntityRenderer.drawModel(
+                    //#if MC <= 12105
+                    //$$ guiGraphics.pose()
+                    //#else
+                    guiGraphics
+                    //#endif
+                    , this.getX()
+                    //#if MC <= 12105
+                    //$$+ (this.getWidth() / 2)
+                    //#endif
+                    , this.getY()
+                    //#if MC <= 12105
+                    //$$+this.height+10
+                    //#else
+                            +10
+                    //#endif
+                    ,
+                    size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, partialTicks
+            );
+        } catch (Exception ignored){}
+        //#if MC <= 12105
+        //$$ guiGraphics.pose().popPose();
+        //#else
+        guiGraphics.pose().popMatrix();
+        //#endif
     }
 
     OnPress onPress;

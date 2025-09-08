@@ -1,10 +1,14 @@
 package ru.kelcuprum.clovskins.client.gui.components;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionfc;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.styles.AbstractStyle;
@@ -64,21 +68,49 @@ public class PlayerButton extends AbstractButton {
         int scale = size / 45;
         float followX = (float) (this.getX() + (this.getWidth() / 2)) - mouseX;
         float followY = (float) (((float) (this.getY() + (this.height / 2.5)) - mouseY) - (7.5 * scale * AlinLib.MINECRAFT.options.guiScale().get()));
-        float rotation = 0;
+        float rotation =
+                //#if MC <= 12105
+                //$$ 0f
+                //#else
+                180f
+                //#endif
+                ;
         if (!followMouse) followX = followY = 0;
         if (rotate) {
             followX = followY = 0;
             rotation = getRotation();
         }
 
-        guiGraphics.pose().pushPose();
+        //#if MC <= 12105
+        //$$ guiGraphics.pose().pushPose();
+        //#else
+        Matrix3x2f matrix3x2f = guiGraphics.pose().pushMatrix();
+        PoseStack pose = new PoseStack(); 
+        //#endif
         try {
             GuiEntityRenderer.drawModel(
-                    guiGraphics.pose(), this.getX() + (this.getWidth() / 2), this.getY()+this.height-25,
+                    //#if MC <= 12105
+                    //$$ guiGraphics.pose()
+                    //#else
+                    guiGraphics
+                    //#endif
+                    , this.getX()
+                    //#if MC <= 12105
+                    //$$+ (this.getWidth() / 2)
+                    //#endif
+                    , this.getY()
+                    //#if MC <= 12105
+                    //$$+this.height-25
+                    //#endif
+                    ,
                     size, rotation, followX, followY, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, partialTicks
             );
         } catch (Exception ignored){}
-        guiGraphics.pose().popPose();
+        //#if MC <= 12105
+        //$$ guiGraphics.pose().popPose();
+        //#else
+        guiGraphics.pose().popMatrix();
+        //#endif
         AbstractStyle style = ClovSkins.config.getBoolean("MENU.ALINLIB", false) ? GuiUtils.getSelected() : ClovSkins.vanillaLikeStyle;
         style.renderBackground$widget(guiGraphics, getX(), getBottom() - 20, width, 20, active, isHovered && mouseY > getBottom() - 20);
         if (GuiUtils.isDoesNotFit(getMessage(), width, 20))

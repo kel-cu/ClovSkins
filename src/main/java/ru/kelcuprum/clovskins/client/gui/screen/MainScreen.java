@@ -1,10 +1,16 @@
 package ru.kelcuprum.clovskins.client.gui.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionfc;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.info.Player;
@@ -53,12 +59,36 @@ public class MainScreen extends Screen {
     public static void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size, float tick){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
-            guiGraphics.pose().pushPose();
-            GuiEntityRenderer.drawModel(
-                    guiGraphics.pose(), x + (size / 2), y+size*2,
-                    size, rotation, 0, 0, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, tick
-            );
-            guiGraphics.pose().popPose();
+            //#if MC <= 12105
+            //$$ guiGraphics.pose().pushPose();
+            //#else
+            Matrix3x2f matrix3x2f = guiGraphics.pose().pushMatrix();
+            PoseStack pose = new PoseStack();
+            //#endif
+            try {
+                GuiEntityRenderer.drawModel(
+                        //#if MC <= 12105
+                        //$$ guiGraphics.pose()
+                        //#else
+                        guiGraphics
+                        //#endif
+                        , x
+                                //#if MC <= 12105
+                                //$$ + (size / 2)
+                                //#endif
+                        , y
+                        //#if MC <= 12105
+                        //$$+size*2
+                        //#endif
+                        ,
+                        size, rotation, 0, 0, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, tick
+                );
+            } catch (Exception ignored){}
+            //#if MC <= 12105
+            //$$ guiGraphics.pose().popPose();
+            //#else
+            guiGraphics.pose().popMatrix();
+            //#endif
         } catch (Exception ignored){}
     }
 

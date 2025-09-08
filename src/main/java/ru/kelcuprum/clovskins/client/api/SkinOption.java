@@ -115,7 +115,6 @@ public class SkinOption {
         if (resourceLocationMap.containsKey(skin)) return resourceLocationMap.get(skin);
         else {
             if (!urls.getOrDefault(skin, false)) {
-                if(System.currentTimeMillis() - lastUpdate > 1500) {
                     lastUpdate = System.currentTimeMillis();
                     urls.put(skin, true);
                     new Thread(() -> {
@@ -126,10 +125,10 @@ public class SkinOption {
                                 case FILE -> image = ImageIO.read(new File(skin));
                                 case NICKNAME -> {
                                     try {
-                                        JsonObject json = MojangAPI.getSkinURL(skin);
-                                        if(json == null) return;
-                                        model = jsonElementIsNull("metadata.model", json) ? PlayerSkin.Model.WIDE : PlayerSkin.Model.SLIM;
-                                        image = ImageIO.read(new URL(getStringInJSON("url", json, "https://textures.minecraft.net/texture/d5c4ee5ce20aed9e33e866c66caa37178606234b3721084bf01d13320fb2eb3f")));
+                                            JsonObject json = MojangAPI.getSkinURL(skin);
+                                            if (json == null) return;
+                                            model = jsonElementIsNull("metadata.model", json) ? PlayerSkin.Model.WIDE : PlayerSkin.Model.SLIM;
+                                            image = ImageIO.read(new URL(getStringInJSON("url", json, "https://textures.minecraft.net/texture/d5c4ee5ce20aed9e33e866c66caa37178606234b3721084bf01d13320fb2eb3f")));
                                     } catch (Exception exception){
                                         exception.printStackTrace();
                                     }
@@ -140,7 +139,6 @@ public class SkinOption {
                         }
                         resourceLocationMap.put(skin, image);
                     }).start();
-                }
             }
             return null;
         }

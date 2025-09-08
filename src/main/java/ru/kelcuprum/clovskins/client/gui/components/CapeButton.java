@@ -4,6 +4,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+//#if MC >= 12106
+import net.minecraft.client.renderer.RenderPipelines;
+//#endif
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -39,9 +42,21 @@ public class CapeButton extends AbstractButton {
         if (GuiUtils.isDoesNotFit(Component.literal(name), width, 20))
             renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(name), style.getTextColor(active), getY(), getY()+20);
         else GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(name), getX()+width/2, getY()+7, style.getTextColor(active), true);
-        if(skinOption.cape.equals(key)) guiGraphics.blit(RenderType::guiTextured, GuiUtils.getResourceLocation("textures/gui/sprites/icon/checkmark.png"), getRight()-14, getY()+5, 0f, 0f, 9, 8, 9, 8);
+        if(skinOption.cape.equals(key)) guiGraphics.blit(
+                        //#if MC >= 12106
+                        RenderPipelines.GUI_TEXTURED,
+                        //#elseif MC >= 12102
+                        //$$ RenderType::guiTextured,
+                        //#endif
+                         GuiUtils.getResourceLocation("textures/gui/sprites/icon/checkmark.png"), getRight()-14, getY()+5, 0f, 0f, 9, 8, 9, 8);
         int capeWidth = size / 16 * 10;
-        guiGraphics.blit(RenderType::guiTextured, cape, getX()+getWidth()/2-capeWidth/2, getY()+25, 1.0F, 1.0F, capeWidth, size, 10, 16, 64, 32);
+        guiGraphics.blit(
+                        //#if MC >= 12106
+                        RenderPipelines.GUI_TEXTURED,
+                        //#elseif MC >= 12102
+                        //$$ RenderType::guiTextured,
+                        //#endif
+                         cape, getX()+getWidth()/2-capeWidth/2, getY()+25, 1.0F, 1.0F, capeWidth, size, 10, 16, 64, 32);
     }
 
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {

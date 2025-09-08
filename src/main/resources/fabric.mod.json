@@ -11,7 +11,7 @@
     "sources": "https://github.com/kel-cu/clovskins",
     "email": "me@kelcuprum.ru"
   },
-  "license": "PolyForm Strict License 1.0.0",
+  "license": "ClovLicense 1.0.0",
   "icon": "assets/clovskins/icon.png",
   "accessWidener": "clovskins.accesswidener",
   "environment": "client",

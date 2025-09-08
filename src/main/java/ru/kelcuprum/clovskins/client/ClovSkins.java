@@ -119,21 +119,28 @@ public class ClovSkins implements ClientModInitializer {
     }
 
     public void loadSkins(){
+        SkinOption defaultSkin;
         if(Player.isLicenseAccount()) {
-            JsonObject defaultSkin = new JsonObject();
-            defaultSkin.addProperty("name", Player.getName());
-            defaultSkin.addProperty("skin", Player.getName());
-            defaultSkin.addProperty("cape", cape);
-            defaultSkin.addProperty("type", "nickname");
-            skinOptions.put("default", SkinOption.getSkinOption(defaultSkin, new File(getPath()+"/skins/default.json")));
+            JsonObject defaultSkinData = new JsonObject();
+            defaultSkinData.addProperty("name", Player.getName());
+            defaultSkinData.addProperty("skin", Player.getName());
+            defaultSkinData.addProperty("cape", cape);
+            defaultSkinData.addProperty("type", "nickname");
+            defaultSkin = SkinOption.getSkinOption(defaultSkinData, new File(getPath()+"/skins/default.json"));
         }
-        else skinOptions.put("default", new SkinOption("Default skin", "MHF_Steve", "", PlayerSkin.Model.SLIM, NICKNAME, new File(getPath()+"/skins/default.json")));
+        else defaultSkin = new SkinOption("Default skin", "MHF_Steve", "", PlayerSkin.Model.SLIM, NICKNAME, new File(getPath()+"/skins/default.json"));
+        try {
+            defaultSkin.getTexture();
+        } catch (Exception ignored){}
+        skinOptions.put("default", defaultSkin);
         File skins = new File(getPath()+"/skins");
         if(!skins.exists() || !skins.isDirectory()) return;
         for(File file : skins.listFiles()){
             if(file.isFile() && file.getName().toLowerCase().endsWith(".json")){
                 try {
-                    skinOptions.put(file.getName().substring(0, file.getName().length()-5), SkinOption.getSkinOption(file));
+                    SkinOption skinOption = SkinOption.getSkinOption(file);
+                    skinOption.getTexture();
+                    skinOptions.put(file.getName().substring(0, file.getName().length()-5), skinOption);
                 } catch (Exception ex){
                     logger.log("Error during file load");
                     ex.printStackTrace();

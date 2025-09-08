@@ -1,9 +1,13 @@
 package ru.kelcuprum.clovskins.client.gui.screen.select;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionfc;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
@@ -126,23 +130,57 @@ public class EditSkinPreset extends Screen {
         guiGraphics.fill(0, height/2-playerHeight/2-15, playerHeight/2+30, height/2+playerHeight/2+15, BLACK_ALPHA);
         guiGraphics.drawCenteredString(font, Component.translatable("clovskins.edit"), width/2, 15, -1);
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, 0, 1900.0);
+        //#if MC <= 12105
+        //$$ guiGraphics.pose().pushPose();
+        //$$ guiGraphics.pose().translate(0, 0, 1900.0);
+        //#else
+        Matrix3x2f matrix3x2f = guiGraphics.pose().pushMatrix();
+        //#endif
         renderPlayer(guiGraphics, 15, height/2-playerHeight/2, playerHeight/2, f);
-        guiGraphics.pose().translate(0, 0, -1900.0);
-        guiGraphics.pose().popPose();
+        //#if MC <= 12105
+        //$$ guiGraphics.pose().translate(0, 0, -1900.0);
+        //$$ guiGraphics.pose().popPose();
+        //#else
+        guiGraphics.pose().popMatrix();
+        //#endif
     }
 
     public double currentTime = getTime();
     public void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size, float tick){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
-            guiGraphics.pose().pushPose();
-            GuiEntityRenderer.drawModel(
-                    guiGraphics.pose(), x + (size / 2), y+size*2+15,
-                    size, rotation, 0, 0, skinOption, tick
-            );
-            guiGraphics.pose().popPose();
+            //#if MC <= 12105
+            //$$ guiGraphics.pose().pushPose();
+            //#else
+            Matrix3x2f matrix3x2f = guiGraphics.pose().pushMatrix();
+            PoseStack pose = new PoseStack(); 
+            //#endif
+            try {
+                GuiEntityRenderer.drawModel(
+                        //#if MC <= 12105
+                        //$$ guiGraphics.pose()
+                        //#else
+                        guiGraphics
+                        //#endif
+                        , x
+                        //#if MC <= 12105
+                        //$$ + (size / 2)
+                        //#endif
+                        , y
+                        //#if MC <= 12105
+                        //$$+size*2+15
+                        //#else
+                                +15
+                        //#endif
+                        ,
+                        size, rotation, 0, 0, skinOption, tick
+                );
+            } catch (Exception ignored){}
+            //#if MC <= 12105
+            //$$ guiGraphics.pose().popPose();
+            //#else
+            guiGraphics.pose().popMatrix();
+            //#endif
         } catch (Exception ignored){}
     }
 
