@@ -3,8 +3,9 @@ package ru.kelcuprum.clovskins.client;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.nimbusds.jose.util.Resource;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.CrashReport;
 import net.minecraft.client.Minecraft;
@@ -12,14 +13,19 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.client.resources.PlayerSkin;
+//#if MC < 12109
+//$$ import net.minecraft.client.resources.PlayerSkin;
+//#else
+import net.minecraft.client.resources.SkinManager;
+import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.world.entity.player.PlayerModelType;
+//#endif
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.AlinLogger;
 import ru.kelcuprum.alinlib.WebAPI;
 import ru.kelcuprum.alinlib.api.events.client.ClientLifecycleEvents;
-import ru.kelcuprum.alinlib.api.events.client.GuiRenderEvents;
 import ru.kelcuprum.alinlib.config.Config;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
@@ -28,6 +34,8 @@ import ru.kelcuprum.alinlib.utils.GsonHelper;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
 import ru.kelcuprum.clovskins.client.gui.screen.SkinCustomScreen;
 import ru.kelcuprum.clovskins.client.gui.style.VanillaLikeStyle;
+import ru.kelcuprum.clovskins.common.packets.HellolPacketPayload;
+import ru.kelcuprum.clovskins.common.packets.SkinPresetPacketPayload;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -36,16 +44,14 @@ import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpRequest;
 import java.nio.file.Files;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.UUID;
 
-import static ru.kelcuprum.alinlib.gui.Icons.WARN;
+import static java.lang.Thread.sleep;
 import static ru.kelcuprum.alinlib.gui.Icons.WARNING;
 import static ru.kelcuprum.alinlib.utils.GsonHelper.getStringInJSON;
 import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.NICKNAME;
-import static ru.kelcuprum.clovskins.client.api.SkinOption.SkinType.URL;
 
 public class ClovSkins implements ClientModInitializer {
     public static Config pathConfig = new Config("config/ClovSkins/path.config.json");
@@ -57,7 +63,13 @@ public class ClovSkins implements ClientModInitializer {
 
     public static HashMap<String, ResourceLocation> cacheResourceLocations = new HashMap<>();
     public static SkinOption currentSkin = null;
-    public static SkinOption safeSkinOption = new SkinOption("default", "MHF_Steve", "", PlayerSkin.Model.SLIM, NICKNAME, new File(getPath()+"/skins/safe.temp.json"));
+    public static SkinOption safeSkinOption = new SkinOption("default", "MHF_Steve", "",
+            //#if MC < 12109
+            //$$PlayerSkin.Model
+            //#else
+            PlayerModelType
+                    //#endif
+                    .SLIM, NICKNAME, new File(getPath()+"/skins/safe.temp.json"));
     public static HashMap<String, SkinOption> skinOptions = new HashMap<>();
     public static VanillaLikeStyle vanillaLikeStyle = new VanillaLikeStyle();
 
@@ -72,7 +84,8 @@ public class ClovSkins implements ClientModInitializer {
         path = path.replace("{HOME}", System.getProperty("user.home")).replace("{USER}", System.getProperty("user.name"));
         return path;
     }
-
+    public static HashMap<UUID, SkinOption> playerSkins = new HashMap<>();
+    public static boolean connectedSupportedServer = false;
     @Override
     public void onInitializeClient() {
         // Логи
@@ -82,8 +95,15 @@ public class ClovSkins implements ClientModInitializer {
         checkFolders();
         // Регистрация ивентов
         ClientLifecycleEvents.CLIENT_FULL_STARTED.register((s) -> {
-            defaultSkin = s.getSkinManager().getInsecureSkin(s.getGameProfile());
             try {
+                defaultSkin =
+                        //#if MC < 12109
+                        //$$ AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile())
+                        //#else
+                        DefaultPlayerSkin.get(AlinLib.MINECRAFT.getGameProfile());
+                //#endif
+
+                ;
                 loadCapes();
             } catch (Exception exception){
                 exception.printStackTrace();
@@ -95,6 +115,35 @@ public class ClovSkins implements ClientModInitializer {
                         .setType(ToastBuilder.Type.WARN).setDisplayTime(10000).buildAndShow();
             }
         });
+        ClientPlayConnectionEvents.JOIN.register((s, s1, s2) -> {
+            ClientPlayNetworking.send(new HellolPacketPayload("peepohuy"));
+            ClientPlayNetworking.send(new SkinPresetPacketPayload(currentSkin.toJSON(true).toString()));
+        });
+        ClientPlayConnectionEvents.DISCONNECT.register((s, s1) -> {
+            playerSkins.clear();
+            connectedSupportedServer = false;
+        });
+        ClientPlayNetworking.registerGlobalReceiver(HellolPacketPayload.ID, (packet, context) -> {
+            connectedSupportedServer = true;
+            ClientPlayNetworking.send(new SkinPresetPacketPayload(currentSkin.toJSON(true).toString()));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(SkinPresetPacketPayload.ID, (packet, context) -> {
+            JsonObject jsonObject = net.minecraft.util.GsonHelper.parse(packet.json());
+            UUID uuid = UUID.fromString(jsonObject.get("player").getAsString());
+            SkinOption skinOption = SkinOption.getSkinOption(jsonObject, null);
+            playerSkins.put(uuid, skinOption);
+            logger.log("%s - %s",uuid.toString(), skinOption.toString());
+            new Thread(() -> {
+                try {
+                    sleep(2000);
+                    SkinOption.urls.remove(skinOption.skin);
+                    SkinOption.resourceLocationMap.remove(skinOption.skin);
+//                    AlinLib.MINECRAFT.getSkinManager().createLookup(AlinLib.MINECRAFT.getConnection().getPlayerInfo(uuid).getProfile(), false);
+                    AlinLib.MINECRAFT.getSkinManager().skinCache.cleanUp();
+                } catch (Exception ignored){}
+            }).start();
+        });
+
     }
 
     public void checkFolders(){
@@ -128,7 +177,13 @@ public class ClovSkins implements ClientModInitializer {
             defaultSkinData.addProperty("type", "nickname");
             defaultSkin = SkinOption.getSkinOption(defaultSkinData, new File(getPath()+"/skins/default.json"));
         }
-        else defaultSkin = new SkinOption("Default skin", "MHF_Steve", "", PlayerSkin.Model.SLIM, NICKNAME, new File(getPath()+"/skins/default.json"));
+        else defaultSkin = new SkinOption("Default skin", "MHF_Steve", "",
+                //#if MC < 12109
+                //$$PlayerSkin.Model
+                //#else
+                PlayerModelType
+                        //#endif
+                        .SLIM, NICKNAME, new File(getPath()+"/skins/default.json"));
         try {
             defaultSkin.getTexture();
         } catch (Exception ignored){}
@@ -193,6 +248,7 @@ public class ClovSkins implements ClientModInitializer {
     }
 
     public static Screen getSkinCustom(Screen parent){
+//        return new SkinCustomizationScreen(parent, AlinLib.MINECRAFT.options);
         return config.getBoolean("MENU.CHANGE_DEFAULT_UI", true) ? new SkinCustomScreen(parent, AlinLib.MINECRAFT.options) : new SkinCustomizationScreen(parent, AlinLib.MINECRAFT.options);
     }
 }

@@ -6,7 +6,14 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.resources.PlayerSkin;
+//#if MC >= 12109
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.world.entity.player.PlayerModelType;
+//#else
+//$$import net.minecraft.client.resources.PlayerSkin;
+//#endif
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix4fc;
@@ -58,7 +65,7 @@ public class PlayerWidget extends AbstractButton {
     }
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-            PlayerSkin playerSkin = AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile());
+        try {
             int scale = size/45;
             float followX = (float) (this.getX() + (this.getWidth() / 2)) - mouseX;
             float followY = (float) (((float) (this.getY() + (this.height/2.5)) - mouseY)-(7.5*scale*AlinLib.MINECRAFT.options.guiScale().get()));
@@ -107,6 +114,10 @@ public class PlayerWidget extends AbstractButton {
         //#else
         guiGraphics.pose().popMatrix();
         //#endif
+
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     OnPress onPress;
@@ -117,7 +128,11 @@ public class PlayerWidget extends AbstractButton {
     }
 
     @Override
-    public void onPress() {
+    public void onPress(
+            //#if MC >= 12109
+            InputWithModifiers input
+            //#endif
+    ) {
         if(onPress != null) onPress.onPress(this);
     }
 

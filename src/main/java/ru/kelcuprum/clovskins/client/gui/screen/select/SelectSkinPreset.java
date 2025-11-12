@@ -100,10 +100,16 @@ public class SelectSkinPreset extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        guiGraphics.drawCenteredString(font, title, width/2, 15, -1);
-        guiGraphics.enableScissor(0, 30+font.lineHeight, width, height-30);
+        int y = 15;
+        if(ClovSkins.connectedSupportedServer) y-=((2+font.lineHeight)/2);
+        guiGraphics.drawCenteredString(font, title, width/2, y, -1);
+        if(ClovSkins.connectedSupportedServer){
+            y+=(2+font.lineHeight);
+            guiGraphics.drawCenteredString(font, Component.translatable("clovskins.select.server_supported"), width/2, y, -1);
+        }
+//        guiGraphics.enableScissor(0, 30+font.lineHeight, width, height-30);
         if (scroller_pages != null) for (AbstractWidget widget : scroller_pages.widgets) widget.render(guiGraphics, i, j, f);
-        guiGraphics.disableScissor();
+//        guiGraphics.disableScissor();
     }
 
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {

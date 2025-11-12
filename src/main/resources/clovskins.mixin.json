@@ -8,6 +8,7 @@
     "MinecraftMixin",
     "OptionsScreenMixin",
     "PlayerInfoMixin",
+    "SkinManagerMixin",
     "gui.PauseScreenMixin",
     "gui.TitleScreenMixin"
   ],

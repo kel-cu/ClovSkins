@@ -4,6 +4,7 @@
   "clovskins.warning.test_mode": "Attention! You are running a test version!\nGlobal settings are not available!!!",
 
   "clovskins.config.main": "Main configs",
+  "clovskins.config.main.upload_to_mojang": "Upload new skins to the Mojang API",
   "clovskins.config.main.data": "Data",
   "clovskins.config.main.data.use_global": "Use a shared folder for all instances",
   "clovskins.config.main.data.path": "Folder (Windows)",
@@ -16,7 +17,9 @@
   "clovskins.config.menu.alinlib": "Use AlinLib style",
   "clovskins.config.menu.two_one_slot": "Split the choice line into two",
   "clovskins.config.menu.title": "Button in the main menu",
+  "clovskins.config.menu.title.left": "Position the buttons on the left",
   "clovskins.config.menu.pause": "Button in the pause menu",
+  "clovskins.config.menu.pause.left": "Position the buttons on the left",
 
   "clovskins.create": "Create skin",
   "clovskins.create.file_name": "File name",
@@ -29,6 +32,7 @@
   "clovskins.main.configs" : "Mod settings",
 
   "clovskins.select": "Your skins",
+  "clovskins.select.server_supported": "Текущий сервер поддерживает ClovSkins!",
   "clovskins.select.edit": "Edit",
   "clovskins.select.create": "Create skin",
   "clovskins.select.cape": "Your capes",

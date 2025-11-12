@@ -1,13 +1,16 @@
 package ru.kelcuprum.clovskins.client.gui.screen.select;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.PlayerSkin;
+//#if MC < 12109
+//$$ import net.minecraft.client.resources.PlayerSkin;
+//#else
+import net.minecraft.world.entity.player.PlayerModelType;
+//#endif
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
-import org.joml.Matrix4fc;
-import org.joml.Quaternionfc;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
@@ -24,6 +27,7 @@ import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
 import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.api.SkinOption;
 import ru.kelcuprum.clovskins.client.gui.cicada.GuiEntityRenderer;
+import ru.kelcuprum.clovskins.common.packets.SkinPresetPacketPayload;
 
 import java.io.File;
 import java.util.Arrays;
@@ -86,7 +90,25 @@ public class EditSkinPreset extends Screen {
         addRenderableWidget(new SelectorBuilder(Component.translatable("clovskins.edit.model")).setList(new String[] {
                 "Default",
                 "Slim"
-        }).setOnPress((s) -> skinOption.model = s.getPosition() == 0 ? PlayerSkin.Model.WIDE : PlayerSkin.Model.SLIM).setValue(skinOption.model == PlayerSkin.Model.WIDE ? 0 : 1).setWidth(componentSize/2-2).setPosition(x+componentSize/2+2, y).build());
+        }).setOnPress((s) -> skinOption.model = s.getPosition() == 0 ?
+                //#if MC < 12109
+                //$$PlayerSkin.Model
+                //#else
+                PlayerModelType
+                        //#endif
+                        .WIDE :
+                //#if MC < 12109
+                //$$PlayerSkin.Model
+                //#else
+                PlayerModelType
+                        //#endif
+                        .SLIM).setValue(skinOption.model ==
+                //#if MC < 12109
+                //$$PlayerSkin.Model
+                //#else
+                PlayerModelType
+                        //#endif
+                        .WIDE ? 0 : 1).setWidth(componentSize/2-2).setPosition(x+componentSize/2+2, y).build());
         addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.remove"), (s) -> {
             AlinLib.MINECRAFT.setScreen(new ConfirmScreen(parent, Component.translatable("clovskins.edit.remove.title"), Component.translatable("clovskins.edit.remove.description"), (b) -> {
                 if(b){
@@ -100,26 +122,28 @@ public class EditSkinPreset extends Screen {
     }
 
     public void openTrackEditor(){
-        MemoryStack stack = MemoryStack.stackPush();
-        PointerBuffer filters = stack.mallocPointer(1);
-        filters.put(stack.UTF8("*.png"));
+        new Thread(() -> {
+            MemoryStack stack = MemoryStack.stackPush();
+            PointerBuffer filters = stack.mallocPointer(1);
+            filters.put(stack.UTF8("*.png"));
 
-        filters.flip();
-        File defaultPath = new File(getPath()).getAbsoluteFile();
-        String defaultString = defaultPath.getAbsolutePath();
-        if(defaultPath.isDirectory() && !defaultString.endsWith(File.separator)){
-            defaultString += File.separator;
-        }
+            filters.flip();
+            File defaultPath = new File(getPath()).getAbsoluteFile();
+            String defaultString = defaultPath.getAbsolutePath();
+            if(defaultPath.isDirectory() && !defaultString.endsWith(File.separator)){
+                defaultString += File.separator;
+            }
 
-        String result = TinyFileDialogs.tinyfd_openFileDialog(Component.translatable("clovskins.edit.file_selector").getString(), defaultString, filters, Component.translatable("clovskins.edit.file_selector.description").getString(), false);
-        if(result == null) return;
-        File file = new File(result);
-        if(file.exists()) {
-            editBox.setValue(file.getAbsolutePath());
-            skinOption.type = SkinOption.SkinType.FILE;
-            selectorType.setPosition(2);
-        }
-        else new ToastBuilder().setIcon(DONT).setType(ToastBuilder.Type.ERROR).setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.edit.file_not_exist")).buildAndShow();
+            String result = TinyFileDialogs.tinyfd_openFileDialog(Component.translatable("clovskins.edit.file_selector").getString(), defaultString, filters, Component.translatable("clovskins.edit.file_selector.description").getString(), false);
+            if(result == null) return;
+            File file = new File(result);
+            if(file.exists()) {
+                editBox.setValue(file.getAbsolutePath());
+                skinOption.type = SkinOption.SkinType.FILE;
+                selectorType.setPosition(2);
+            }
+            else new ToastBuilder().setIcon(DONT).setType(ToastBuilder.Type.ERROR).setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.edit.file_not_exist")).buildAndShow();
+        }).start();
     }
 
     @Override
@@ -197,6 +221,9 @@ public class EditSkinPreset extends Screen {
                     ClovSkins.currentSkin = ClovSkins.skinOptions.getOrDefault("default", ClovSkins.safeSkinOption);
                     ClovSkins.config.setString("SELECTED", "default");
                     ClovSkins.currentSkin.uploadToMojangAPI();
+                    if(ClovSkins.connectedSupportedServer){
+                        ClientPlayNetworking.send(new SkinPresetPacketPayload(skinOption.toJSON(true).toString()));
+                    }
                 }
                 skinOption.delete();
                 ClovSkins.skinOptions.remove(key);

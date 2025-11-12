@@ -5,6 +5,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+//#if MC >= 12109
+import net.minecraft.client.input.InputWithModifiers;
+//#endif
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix4fc;
@@ -72,7 +75,7 @@ public class PlayerButton extends AbstractButton {
                 //#if MC <= 12105
                 //$$ 0f
                 //#else
-                180f
+                0f
                 //#endif
                 ;
         if (!followMouse) followX = followY = 0;
@@ -125,7 +128,11 @@ public class PlayerButton extends AbstractButton {
     }
 
     @Override
-    public void onPress() {
+    public void onPress(
+            //#if MC >= 12109
+            InputWithModifiers input
+            //#endif
+    ) {
         AlinLib.MINECRAFT.setScreen(new MainScreen(AlinLib.MINECRAFT.screen));
     }
 

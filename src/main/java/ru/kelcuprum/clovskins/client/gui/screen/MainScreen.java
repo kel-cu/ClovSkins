@@ -5,6 +5,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+//#if MC >= 12109
+import net.minecraft.client.input.MouseButtonEvent;
+//#endif
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -59,36 +62,12 @@ public class MainScreen extends Screen {
     public static void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size, float tick){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
-            //#if MC <= 12105
-            //$$ guiGraphics.pose().pushPose();
-            //#else
-            Matrix3x2f matrix3x2f = guiGraphics.pose().pushMatrix();
-            PoseStack pose = new PoseStack();
-            //#endif
             try {
                 GuiEntityRenderer.drawModel(
-                        //#if MC <= 12105
-                        //$$ guiGraphics.pose()
-                        //#else
-                        guiGraphics
-                        //#endif
-                        , x
-                                //#if MC <= 12105
-                                //$$ + (size / 2)
-                                //#endif
-                        , y
-                        //#if MC <= 12105
-                        //$$+size*2
-                        //#endif
-                        ,
+                        guiGraphics, x, y,
                         size, rotation, 0, 0, ClovSkins.currentSkin == null ? ClovSkins.safeSkinOption : ClovSkins.currentSkin, tick
                 );
             } catch (Exception ignored){}
-            //#if MC <= 12105
-            //$$ guiGraphics.pose().popPose();
-            //#else
-            guiGraphics.pose().popMatrix();
-            //#endif
         } catch (Exception ignored){}
     }
 
@@ -106,10 +85,17 @@ public class MainScreen extends Screen {
         minecraft.setScreen(screen);
     }
 
+    //#if MC < 12109
+    //$$ @Override
+    //$$ public boolean mouseDragged(double d, double e, int i, double f, double g) {
+    //$$     if(pb != null) pb.setRotation((float) (pb.getRotation()+f));
+    //$$     return super.mouseDragged(d, e, i, f, g);
+    //$$ }
+    //#else
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if(pb != null) pb.setRotation((float) (pb.getRotation()-f));
-
-        return super.mouseDragged(d, e, i, f, g);
+    public boolean mouseDragged(MouseButtonEvent event, double mouseX, double mouseY) {
+        if(pb != null) pb.setRotation((float) (pb.getRotation()+mouseX));
+        return super.mouseDragged(event, mouseX, mouseY);
     }
+    //#endif
 }

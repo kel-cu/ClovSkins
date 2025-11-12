@@ -14,10 +14,16 @@
   "license": "ClovLicense 1.0.0",
   "icon": "assets/clovskins/icon.png",
   "accessWidener": "clovskins.accesswidener",
-  "environment": "client",
+  "environment": "*",
   "entrypoints": {
     "client": [
       "ru.kelcuprum.clovskins.client.ClovSkins"
+    ],
+    "main": [
+      "ru.kelcuprum.clovskins.common.ClovSkinsCommon"
+    ],
+    "server": [
+      "ru.kelcuprum.clovskins.server.ClovSkinsServer"
     ],
     "modmenu": [
       "ru.kelcuprum.clovskins.client.gui.ModMenuIntegration"

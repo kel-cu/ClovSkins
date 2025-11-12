@@ -4,10 +4,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-//#if MC >= 12106
-import net.minecraft.client.renderer.RenderPipelines;
+//#if MC >= 12109
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonEvent;
 //#endif
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import ru.kelcuprum.alinlib.AlinLib;
@@ -71,14 +72,22 @@ public class CapeButton extends AbstractButton {
         renderScrollingString(guiGraphics, font, msg, k, y, l, bottom, j);
     }
 
-    public void onClick(double d, double e) {
+    //#if MC < 12109
+    //$$public void onClick(double d, double e) {
+    //#else
+    public void onClick(MouseButtonEvent event, boolean isDoubleClick) {
+        //#endif
                 if(ClovSkins.currentSkin == skinOption) skinOption.cape = key;
                 skinOption.cape = key;
                 ClovSkins.skinOptions.put(keySkin, skinOption);
     }
 
     @Override
-    public void onPress() {
+    public void onPress(
+            //#if MC >= 12109
+            InputWithModifiers input
+            //#endif
+    ) {
     }
 
 

@@ -2,6 +2,9 @@ package ru.kelcuprum.clovskins.client.mixin.gui;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.PlainTextButton;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -23,20 +26,19 @@ public class PauseScreenMixin extends Screen {
         super(component);
     }
 
-    @Inject(method = "createPauseMenu", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/GridLayout;visitWidgets(Ljava/util/function/Consumer;)V"))
-    void createPauseMenu(CallbackInfo ci, @Local GridLayout gridLayout) {
+    @Inject(method = "init", at = @At(value = "RETURN"))
+    void createPauseMenu(CallbackInfo ci) {
         if(ClovSkins.config.getBoolean("MENU.PAUSE", true)){
-            if (gridLayout != null) {
-                final List<AbstractWidget> buttons = ((AccessorGridLayout) gridLayout).getChildren();
                 boolean isLeft = ClovSkins.config.getBoolean("MENU.PAUSE.LEFT", false);
-                int x =  isLeft ? width : 0;
-                int y = this.height / 4 + 72 - 16 + 1;
-                for (AbstractWidget widget : buttons) {
-                    x = isLeft ? Math.min(x, widget.getX() - 55) : Math.max(x, widget.getRight()+5);
-                    y = Math.max(y, widget.getY());
+            int x =  isLeft ? width : 0;
+            int y = 0;
+            for (GuiEventListener widget : this.children) {
+                if (widget instanceof Button && !(widget instanceof PlainTextButton)) {
+                    x = isLeft ? Math.min(x, ((AbstractWidget) widget).getX() - 55) : Math.max(x, ((AbstractWidget) widget).getRight()+5);
+                    y = Math.max(y, ((AbstractWidget) widget).getY());
                 }
-                buttons.add(new PlayerButton(x, y-100, 50));
             }
+                addRenderableWidget(new PlayerButton(x, y-100, 50));
         }
     }
 }

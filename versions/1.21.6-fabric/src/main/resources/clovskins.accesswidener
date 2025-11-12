@@ -1,5 +1,6 @@
 accessWidener	v1	named
 accessible field net/minecraft/client/gui/screens/Screen children Ljava/util/List;
+accessible field net/minecraft/client/gui/components/SpriteIconButton sprite Lnet/minecraft/resources/ResourceLocation;
 accessible field net/minecraft/client/resources/SkinManager skinCache Lcom/google/common/cache/LoadingCache;
 accessible field net/minecraft/client/resources/SkinManager skinTextures Lnet/minecraft/client/resources/SkinManager$TextureCache;
 accessible field net/minecraft/client/resources/SkinManager capeTextures Lnet/minecraft/client/resources/SkinManager$TextureCache;

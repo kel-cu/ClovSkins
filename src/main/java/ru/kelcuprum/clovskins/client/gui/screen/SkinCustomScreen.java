@@ -4,7 +4,12 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
+//#if MC >= 12109
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+//#endif
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import org.lwjgl.glfw.GLFW;
@@ -12,6 +17,7 @@ import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBooleanBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.selector.SelectorBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.text.TextBuilder;
+import ru.kelcuprum.clovskins.client.ClovSkins;
 import ru.kelcuprum.clovskins.client.gui.components.PlayerWidget;
 
 import static ru.kelcuprum.alinlib.gui.Colors.BLACK_ALPHA;
@@ -67,14 +73,23 @@ public class SkinCustomScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    //#if MC < 12109
+    //$$public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        //#else
+        public boolean keyPressed(KeyEvent event) {
+        int keyCode = event.key();
+        int modifiers = event.modifiers();
+        //#endif
             if(keyCode == GLFW.GLFW_KEY_P && (modifiers & GLFW.GLFW_MOD_SHIFT) != 0){
             AlinLib.MINECRAFT.setScreen(new SkinCustomizationScreen(parent, options));
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        //#if MC < 12109
+        //$$return super.keyPressed(keyCode, scanCode, modifiers);
+        //#else
+        return super.keyPressed(event);
+        //#endif
     }
-
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderBackground(guiGraphics, i, j, f);
@@ -82,9 +97,18 @@ public class SkinCustomScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if(pb != null) pb.setRotation((float) (pb.getRotation()-f));
-
-        return super.mouseDragged(d, e, i, f, g);
+    //#if MC < 12109
+    //$$ public boolean mouseDragged(double d, double e, int i, double f, double g) {
+    //#else
+    public boolean mouseDragged(MouseButtonEvent event, double f, double g) {
+        //#endif
+         if(pb != null) pb.setRotation((float) (pb.getRotation()+f));
+         return super.mouseDragged(
+                 //#if MC < 12109
+                 //$$ d, e, i
+                 //#else
+                 event
+                 //#endif
+                 , f, g);
     }
 }

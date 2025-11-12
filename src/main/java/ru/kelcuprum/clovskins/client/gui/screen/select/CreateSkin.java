@@ -52,13 +52,17 @@ public class CreateSkin extends Screen {
         name = name.toLowerCase();
         if(ResourceLocation.isValidPath(name)){
             File file = new File(getPath()+"/skins/"+name+".json");
-            try {
-                Files.writeString(file.toPath(), ClovSkins.safeSkinOption.toString(), StandardCharsets.UTF_8);
-                SkinOption skinOption = SkinOption.getSkinOption(file);
-                ClovSkins.skinOptions.put(name, skinOption);
-                AlinLib.MINECRAFT.setScreen(new EditSkinPreset(parent, skinOption, name, false));
-            } catch (Exception ex){
-                new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.literal(ex.getMessage())).setType(ToastBuilder.Type.ERROR).buildAndShow();
+            if(file.exists()){
+                new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.literal("File exist")).setType(ToastBuilder.Type.ERROR).buildAndShow();
+            } else {
+                try {
+                    Files.writeString(file.toPath(), ClovSkins.safeSkinOption.toString(), StandardCharsets.UTF_8);
+                    SkinOption skinOption = SkinOption.getSkinOption(file);
+                    ClovSkins.skinOptions.put(name, skinOption);
+                    AlinLib.MINECRAFT.setScreen(new EditSkinPreset(parent, skinOption, name, false));
+                } catch (Exception ex){
+                    new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.literal(ex.getMessage())).setType(ToastBuilder.Type.ERROR).buildAndShow();
+                }
             }
         } else {
             new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.literal("Non [a-z0-9_.-] character in namespace of location: "+name)).setType(ToastBuilder.Type.ERROR).buildAndShow();

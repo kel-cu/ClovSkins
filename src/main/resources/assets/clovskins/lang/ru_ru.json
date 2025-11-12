@@ -4,6 +4,7 @@
   "clovskins.warning.test_mode": "Внимание! У вас запущена тестовая версия!\nГлобальные настройки недоступны!!!",
 
   "clovskins.config.main": "Основные настройки",
+  "clovskins.config.main.upload_to_mojang": "Загружать новые скины в Mojang API",
   "clovskins.config.main.data": "Данные",
   "clovskins.config.main.data.use_global": "Использовать общую папку для всех клиентов",
   "clovskins.config.main.data.path": "Папка (Windows)",
@@ -16,7 +17,9 @@
   "clovskins.config.menu.alinlib": "Использовать стиль AlinLib",
   "clovskins.config.menu.two_one_slot": "Разделить линию выбора на два",
   "clovskins.config.menu.title": "Кнопка в главном меню",
+  "clovskins.config.menu.title.left": "Распалагать кнопки слева",
   "clovskins.config.menu.pause": "Кнопка в меню паузы",
+  "clovskins.config.menu.pause.left": "Распалагать кнопки слева",
 
   "clovskins.create": "Создание скина",
   "clovskins.create.file_name": "Название файла",
@@ -29,6 +32,7 @@
   "clovskins.main.configs" : "Настройки мода",
 
   "clovskins.select": "Ваши скины",
+  "clovskins.select.server_supported": "Текущий сервер поддерживает ClovSkins!",
   "clovskins.select.edit": "Редактировать",
   "clovskins.select.create": "Создать скин",
   "clovskins.select.cape": "Ваши плащи",

@@ -1,7 +1,7 @@
 plugins {
     id 'maven-publish'
     id "io.github.goooler.shadow" version "8.1.7" apply false
-    id "fabric-loom" version "1.10-SNAPSHOT" apply false
+    id "fabric-loom" version "1.11-SNAPSHOT" apply false
     id "io.github.p03w.machete" version "2.+" apply false
 
     // https://github.com/ReplayMod/preprocessor
@@ -13,12 +13,10 @@ plugins {
 }
 
 preprocess {
-    def mc1213_fabric = createNode('1.21.3-fabric', 1_21_03, '')
-    def mc1215_fabric = createNode('1.21.5-fabric', 1_21_05, '')
     def mc1216_fabric = createNode('1.21.6-fabric', 1_21_06, '')
-    mc1213_fabric.link(mc1216_fabric, null)
-    mc1215_fabric.link(mc1216_fabric, null)
-    mc1216_fabric.link(mc1216_fabric, null)
+    def mc1219_fabric = createNode('1.21.9-fabric', 1_21_09, '')
+    mc1216_fabric.link(mc1219_fabric, null)
+    mc1219_fabric.link(mc1219_fabric, null)
 }
 
 publishing {
