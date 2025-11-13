@@ -27,9 +27,9 @@ public class ClovSkinsServer implements DedicatedServerModInitializer {
                 JsonObject jsonObject = skinOptions.get(serverPlayer).toJSON();
                 jsonObject.addProperty("player", serverPlayer.getStringUUID());
                 SkinPresetPacketPayload skinPresetPacketPayload = new SkinPresetPacketPayload(jsonObject.toString());
-                ServerPlayNetworking.send(player, skinPresetPacketPayload);
-                logger.log("[%s] %s - %s", player.getName().getString(), serverPlayer.getName().getString(), skinPresetPacketPayload.json());
-            }
+                        ServerPlayNetworking.send(player, skinPresetPacketPayload);
+                        logger.log("[%s] %s - %s", player.getName().getString(), serverPlayer.getName().getString(), skinPresetPacketPayload.json());
+                    }
         });
         ServerPlayNetworking.registerGlobalReceiver(SkinPresetPacketPayload.ID, (packet, context) -> {
             JsonObject jsonObject = GsonHelper.parse(packet.json());

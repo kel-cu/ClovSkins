@@ -25,7 +25,7 @@ public class MainConfigs {
         screenBuilder.setCategoryTitle(Component.translatable("clovskins.config.main"));
         screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.main"), (s) -> AlinLib.MINECRAFT.setScreen(MainConfigs.build(parent))));
         screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.menu"), (s) -> AlinLib.MINECRAFT.setScreen(MenuConfigs.build(parent))));
-
+        screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.main.upload_to_mojang"), true).setConfig(ClovSkins.config, "UPLOAD_TO_MOJANG"));
         screenBuilder.addWidget(new CategoryBox(Component.translatable("clovskins.config.main.data"))
                 .addValue(new ButtonBooleanBuilder(Component.translatable("clovskins.config.main.data.use_global"), false).setConfig(ClovSkins.pathConfig, "USE_GLOBAL"))
                 .addValue(new EditBoxBuilder(Component.translatable("clovskins.config.main.data.path")).setValue("{HOME}/ClovSkins").setConfig(ClovSkins.pathConfig, "PATH"))

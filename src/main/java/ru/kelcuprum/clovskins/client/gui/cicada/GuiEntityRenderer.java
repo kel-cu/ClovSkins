@@ -47,7 +47,6 @@ public class GuiEntityRenderer {
                             //#endif
                             .SLIM);
             guiGraphics.submitSkinRenderState(fakePlayerModel, skinOption.getTextureSkin(), size, 0, rotation, 0f, x-size5Percent, y - size5Percent, x + size+size5Percent, y + (size * 2));
-            guiGraphics.disableScissor();
         } catch (Exception ex) {
 
         }

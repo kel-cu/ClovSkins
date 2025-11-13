@@ -84,7 +84,7 @@ public class ClovSkins implements ClientModInitializer {
         path = path.replace("{HOME}", System.getProperty("user.home")).replace("{USER}", System.getProperty("user.name"));
         return path;
     }
-    public static HashMap<UUID, SkinOption> playerSkins = new HashMap<>();
+    public static HashMap<String, SkinOption> playerSkins = new HashMap<>();
     public static boolean connectedSupportedServer = false;
     @Override
     public void onInitializeClient() {
@@ -129,19 +129,9 @@ public class ClovSkins implements ClientModInitializer {
         });
         ClientPlayNetworking.registerGlobalReceiver(SkinPresetPacketPayload.ID, (packet, context) -> {
             JsonObject jsonObject = net.minecraft.util.GsonHelper.parse(packet.json());
-            UUID uuid = UUID.fromString(jsonObject.get("player").getAsString());
             SkinOption skinOption = SkinOption.getSkinOption(jsonObject, null);
-            playerSkins.put(uuid, skinOption);
-            logger.log("%s - %s",uuid.toString(), skinOption.toString());
-            new Thread(() -> {
-                try {
-                    sleep(2000);
-                    SkinOption.urls.remove(skinOption.skin);
-                    SkinOption.resourceLocationMap.remove(skinOption.skin);
-//                    AlinLib.MINECRAFT.getSkinManager().createLookup(AlinLib.MINECRAFT.getConnection().getPlayerInfo(uuid).getProfile(), false);
-                    AlinLib.MINECRAFT.getSkinManager().skinCache.cleanUp();
-                } catch (Exception ignored){}
-            }).start();
+            playerSkins.put(jsonObject.get("player").getAsString(), skinOption);
+            logger.log("%s - %s",jsonObject.get("player").getAsString(), skinOption.toString());
         });
 
     }
