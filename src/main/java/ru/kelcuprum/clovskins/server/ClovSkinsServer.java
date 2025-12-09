@@ -33,6 +33,7 @@ public class ClovSkinsServer implements DedicatedServerModInitializer {
         });
         ServerPlayNetworking.registerGlobalReceiver(SkinPresetPacketPayload.ID, (packet, context) -> {
             JsonObject jsonObject = GsonHelper.parse(packet.json());
+            jsonObject.addProperty("name", String.format("%s_%s", context.player().getName().getString(), System.currentTimeMillis()));
             SkinOption skinOption = SkinOption.getSkinOption(jsonObject);
             skinOptions.put(context.player(), skinOption);
             jsonObject.addProperty("player", context.player().getStringUUID());

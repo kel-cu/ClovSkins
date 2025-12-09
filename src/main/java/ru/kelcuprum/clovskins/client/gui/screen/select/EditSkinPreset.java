@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.Screen;
 //#else
 import net.minecraft.world.entity.player.PlayerModelType;
 //#endif
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 import org.lwjgl.PointerBuffer;
@@ -16,6 +17,7 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
+import ru.kelcuprum.alinlib.gui.Icons;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.editbox.EditBoxBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.selector.SelectorBuilder;
@@ -46,6 +48,7 @@ public class EditSkinPreset extends Screen {
     public boolean isDeleted = false;
     public EditSkinPreset(Screen screen, SkinOption skinOption, String key, Boolean isSelected) {
         super(Component.translatable("clovskins.edit"));
+        changed = false;
         this.parent = screen;
         this.skinOption = skinOption;
         this.skinOptionOriginal = skinOption;
@@ -63,6 +66,7 @@ public class EditSkinPreset extends Screen {
     };
 
 
+    public static boolean changed = false;
     @Override
     protected void init() {
         int playerHeight = (int) ((height - 20 - font.lineHeight - 30) * 0.8);
@@ -85,24 +89,30 @@ public class EditSkinPreset extends Screen {
                 "URL",
                 "File"
         }).setValue(Arrays.stream(skinTypes).toList().indexOf(skinOption.toJSON().get("type").getAsString())).setOnPress((s) -> {
+            changed = true;
+            SkinOption.urls.remove(skinOption.skin);
+            SkinOption.resourceLocationMap.remove(skinOption.skin);
             skinOption.setSkinTexture(s.getPosition() == 0 ? SkinOption.SkinType.NICKNAME : s.getPosition() == 1 ? SkinOption.SkinType.URL : SkinOption.SkinType.FILE, skinOption.skin);
         }).setWidth(componentSize/2-2).setPosition(x,y).build());
         addRenderableWidget(new SelectorBuilder(Component.translatable("clovskins.edit.model")).setList(new String[] {
                 "Default",
                 "Slim"
-        }).setOnPress((s) -> skinOption.model = s.getPosition() == 0 ?
-                //#if MC < 12109
-                //$$PlayerSkin.Model
-                //#else
-                PlayerModelType
-                        //#endif
-                        .WIDE :
-                //#if MC < 12109
-                //$$PlayerSkin.Model
-                //#else
-                PlayerModelType
-                        //#endif
-                        .SLIM).setValue(skinOption.model ==
+        }).setOnPress((s) -> {
+            skinOption.model = s.getPosition() == 0 ?
+                    //#if MC < 12109
+                    //$$PlayerSkin.Model
+                    //#else
+                    PlayerModelType
+                            //#endif
+                            .WIDE :
+                    //#if MC < 12109
+                    //$$PlayerSkin.Model
+                    //#else
+                    PlayerModelType
+                            //#endif
+                            .SLIM;
+            changed = true;
+        }).setValue(skinOption.model ==
                 //#if MC < 12109
                 //$$PlayerSkin.Model
                 //#else
@@ -119,6 +129,8 @@ public class EditSkinPreset extends Screen {
         }).setSprite(DONT).setWidth(20).setPosition(x+componentSize+5, y).build());
         y+=25;
         addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.select_cape"), (s) -> AlinLib.MINECRAFT.setScreen(new SelectCape(AlinLib.MINECRAFT.screen, skinOption, key))).setWidth(componentSize).setPosition(x, y).build());
+        addRenderableWidget(new ButtonBuilder(CommonComponents.GUI_BACK, (s) -> onClose())
+                .setSprite(Icons.EXIT).setWidth(20).setPosition(x+componentSize+5, y).build());
     }
 
     public void openTrackEditor(){
@@ -138,9 +150,10 @@ public class EditSkinPreset extends Screen {
             if(result == null) return;
             File file = new File(result);
             if(file.exists()) {
-                editBox.setValue(file.getAbsolutePath());
-                skinOption.type = SkinOption.SkinType.FILE;
+                skinOption.setSkinTexture(SkinOption.SkinType.FILE, file.getAbsolutePath());
                 selectorType.setPosition(2);
+                minecraft.execute(() -> editBox.setValue(file.getAbsolutePath()));
+//                editBox.setValue(file.getAbsolutePath());
             }
             else new ToastBuilder().setIcon(DONT).setType(ToastBuilder.Type.ERROR).setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.edit.file_not_exist")).buildAndShow();
         }).start();
@@ -231,7 +244,16 @@ public class EditSkinPreset extends Screen {
             } else {
                 skinOption.save();
                 if(ClovSkins.currentSkin == skinOptionOriginal) {
-                    if(!skinOption.equals(skinOptionOriginal)) skinOption.uploadToMojangAPI();
+                    if(!skinOption.skin.equals(skinOptionOriginal.skin)
+                    || skinOption.cape.equals(skinOptionOriginal.cape)
+                    || skinOption.model != skinOptionOriginal.model
+                    || skinOption.type != skinOptionOriginal.type) {
+                        AlinLib.LOG.log("changed");
+                        if(ClovSkins.connectedSupportedServer){
+                            ClientPlayNetworking.send(new SkinPresetPacketPayload(skinOption.toJSON(true).toString()));
+                        }
+                        skinOption.uploadToMojangAPI();
+                    }
                     ClovSkins.currentSkin = skinOption;
                 }
                 ClovSkins.skinOptions.put(key, skinOption);
@@ -239,6 +261,7 @@ public class EditSkinPreset extends Screen {
         } catch (Exception exception){
             exception.printStackTrace();
         }
+
         AlinLib.MINECRAFT.setScreen(parent);
     }
 }

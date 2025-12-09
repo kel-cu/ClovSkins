@@ -153,27 +153,6 @@ public class SkinOption {
         return location;
     }
 
-    public void register2DSkinRender(BufferedImage bufferedImage) throws IOException {
-        ResourceLocation location = GuiUtils.getResourceLocation("skin", file.getName());
-        BufferedImage bufferedImage1 = new BufferedImage(40, 68, BufferedImage.TYPE_INT_RGB);
-        // -=-=-=-
-        Graphics2D g2d = bufferedImage.createGraphics();
-//        g2d.drawImage();
-        // -=-=-=-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage1, "png", byteArrayOutputStream);
-        InputStream is = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-        NativeImage nativeImage = NativeImage.read(is);
-        Minecraft.getInstance().execute(() -> {
-            DynamicTexture texture =
-                    //#if MC >= 12105
-                    new DynamicTexture(() -> file.getName(), nativeImage);
-            //#else
-            //$$ new DynamicTexture(nativeImage);
-            //#endif
-            Minecraft.getInstance().getTextureManager().register(location, texture);
-        });
-    };
     public ResourceLocation getTextureCape(){
         return ClovSkins.capes.getOrDefault(cape, null);
     }
@@ -368,6 +347,11 @@ public class SkinOption {
     @Override
     public String toString() {
         return toJSON().toString();
+    }
+    public static void reset(SkinOption skinOption){
+        resourceLocationMap.remove(skinOption.skin);
+        urls.remove(skinOption.skin);
+        ClovSkins.cacheResourceLocations.remove(skinOption.skin);
     }
 
     public static SkinOption getSkinOption(File file) throws IOException {

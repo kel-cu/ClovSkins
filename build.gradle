@@ -3,6 +3,7 @@ plugins {
     id "io.github.goooler.shadow" version "8.1.7" apply false
     id "fabric-loom" version "1.11-SNAPSHOT" apply false
     id "io.github.p03w.machete" version "2.+" apply false
+    id "com.modrinth.minotaur" version "2.+"
 
     // https://github.com/ReplayMod/preprocessor
     // https://github.com/Fallen-Breath/preprocessor
@@ -54,5 +55,11 @@ tasks.register('buildAndGather') {
                 duplicatesStrategy DuplicatesStrategy.INCLUDE
             }
         }
+    }
+}
+
+tasks.register('modrinthAll') {
+    subprojects {
+        dependsOn project.tasks.named('modrinth').get()
     }
 }

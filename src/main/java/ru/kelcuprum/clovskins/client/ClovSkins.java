@@ -98,12 +98,10 @@ public class ClovSkins implements ClientModInitializer {
             try {
                 defaultSkin =
                         //#if MC < 12109
-                        //$$ AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile())
+                        //$$ AlinLib.MINECRAFT.getSkinManager().getInsecureSkin(AlinLib.MINECRAFT.getGameProfile());
                         //#else
                         DefaultPlayerSkin.get(AlinLib.MINECRAFT.getGameProfile());
                 //#endif
-
-                ;
                 loadCapes();
             } catch (Exception exception){
                 exception.printStackTrace();
@@ -130,6 +128,7 @@ public class ClovSkins implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(SkinPresetPacketPayload.ID, (packet, context) -> {
             JsonObject jsonObject = net.minecraft.util.GsonHelper.parse(packet.json());
             SkinOption skinOption = SkinOption.getSkinOption(jsonObject, null);
+            SkinOption.reset(skinOption);
             playerSkins.put(jsonObject.get("player").getAsString(), skinOption);
             logger.log("%s - %s",jsonObject.get("player").getAsString(), skinOption.toString());
         });
