@@ -1,7 +1,7 @@
 package ru.kelcuprum.clovskins.client.gui.screen;
 
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
 //#if MC >= 12109
@@ -81,7 +81,7 @@ public class SkinCustomScreen extends Screen {
         int modifiers = event.modifiers();
         //#endif
             if(keyCode == GLFW.GLFW_KEY_P && (modifiers & GLFW.GLFW_MOD_SHIFT) != 0){
-            AlinLib.MINECRAFT.setScreen(new SkinCustomizationScreen(parent, options));
+            AlinLib.MINECRAFT.gui.setScreen(new SkinCustomizationScreen(parent, options));
             return true;
         }
         //#if MC < 12109
@@ -91,8 +91,8 @@ public class SkinCustomScreen extends Screen {
         //#endif
     }
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         guiGraphics.fill(0, 0, 0, 0, BLACK_ALPHA);
     }
 

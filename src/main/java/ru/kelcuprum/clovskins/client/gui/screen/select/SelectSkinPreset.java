@@ -1,6 +1,6 @@
 package ru.kelcuprum.clovskins.client.gui.screen.select;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -57,7 +57,7 @@ public class SelectSkinPreset extends Screen {
         }
         addWidgetsToScroller(widgets_pages, scroller_pages);
 
-        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.select.create"), (s) -> AlinLib.MINECRAFT.setScreen(new CreateSkin(this))).setWidth(200).setPosition(width/2-100, height-25).build());
+        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.select.create"), (s) -> AlinLib.MINECRAFT.gui.setScreen(new CreateSkin(this))).setWidth(200).setPosition(width/2-100, height-25).build());
         addRenderableWidget(new ButtonBuilder(CommonComponents.GUI_BACK, (s) -> onClose()).setSprite(EXIT).setSize(20, 20).setPosition(width/2+105, height-25).build());
     }
 
@@ -91,24 +91,24 @@ public class SelectSkinPreset extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         guiGraphics.fill(0, 0, width, height, BLACK_ALPHA);
         guiGraphics.fill(0, 30 + font.lineHeight, width, height - 30, BLACK_ALPHA);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         int y = 15;
         if(ClovSkins.connectedSupportedServer) y-=((2+font.lineHeight)/2);
-        guiGraphics.drawCenteredString(font, title, width/2, y, -1);
+        guiGraphics.centeredText(font, title, width/2, y, -1);
         if(ClovSkins.connectedSupportedServer){
             y+=(2+font.lineHeight);
-            guiGraphics.drawCenteredString(font, Component.translatable("clovskins.select.server_supported"), width/2, y, -1);
+            guiGraphics.centeredText(font, Component.translatable("clovskins.select.server_supported"), width/2, y, -1);
         }
 //        guiGraphics.enableScissor(0, 30+font.lineHeight, width, height-30);
-        if (scroller_pages != null) for (AbstractWidget widget : scroller_pages.widgets) widget.render(guiGraphics, i, j, f);
+        if (scroller_pages != null) for (AbstractWidget widget : scroller_pages.widgets) widget.extractRenderState(guiGraphics, i, j, f);
 //        guiGraphics.disableScissor();
     }
 
@@ -127,6 +127,6 @@ public class SelectSkinPreset extends Screen {
     @Override
     public void onClose() {
         if(minecraft == null) return;
-        minecraft.setScreen(parent);
+        minecraft.gui.setScreen(parent);
     }
 }

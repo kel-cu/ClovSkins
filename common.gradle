@@ -1,23 +1,20 @@
 apply plugin: 'maven-publish'
-apply plugin: 'fabric-loom'
+apply plugin: 'net.fabricmc.fabric-loom'
 apply plugin: 'com.replaymod.preprocess'
 apply plugin: 'me.fallenbreath.yamlang'
 apply plugin: 'io.github.goooler.shadow'
 apply plugin: 'com.modrinth.minotaur'
 
 def mod_brand = "fabric"
-archivesBaseName = (project.archives_base_name == null ? rootProject.archives_base_name : project.archives_base_name) + "-" + mod_brand
+base {
+    archivesName = (project.archives_base_name == null ? rootProject.archives_base_name : project.archives_base_name) + "-" + mod_brand
+}
 group = rootProject.maven_group
 
 int mcVersion = 1
 preprocess {
     mcVersion = vars.get()["MC"] as int
-    tabIndentation = true
-    vars.put("WALTER", archivesBaseName.startsWith("Walter") ? 1 : 0)
     vars.put("MC", mcVersion)
-    vars.put("FABRIC", mod_brand == 'fabric' ? 1 : 0)
-    vars.put("FORGE", mod_brand == 'forge' ? 1 : 0)
-    vars.put("NEOFORGE", mod_brand == 'neoforge' ? 1 : 0)
 }
 
 repositories {
@@ -40,20 +37,7 @@ configurations {
     modRuntimeOnly.exclude group: 'net.fabricmc', module: 'fabric-loader'
 }
 loom {
-    runConfigs.client {
-        // to make sure it generates all "Minecraft Client (:subproject_name)" applications
-        ideConfigGenerated = true
-        runDir '../../run'
-        vmArgs '-Dmixin.debug.export=true'
-    }
     accessWidenerPath = file("../../src/main/resources/clovskins.accesswidener")
-    if (mod_brand == 'forge') {
-        forge {
-            convertAccessWideners = true
-        }
-    }
-}
-remapJar {
 }
 
 configurations {
@@ -67,30 +51,20 @@ dependencies {
     // loom
     implementation("com.google.code.gson:gson:2.10.1")
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.layered() {
-        officialMojangMappings()
-        parchment "org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_version}@zip"
-    }
     // Music
     implementation("meteordevelopment:starscript:0.3.4")
 //    include modImplementation("maven.modrinth:cicada:${project.cicada_version}")
-    modCompileOnly("maven.modrinth:entitytexturefeatures:${project.etf_version}")
+    compileOnly("maven.modrinth:entitytexturefeatures:${project.etf_version}")
 
-    include group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.10'
-    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.10'
-
-    include group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.10'
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.10'
-
-    include group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.12'
-    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.12'
+    include group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.4'
+    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.4'
 
     // Minecraft
     if (mod_brand == 'fabric') {
-        modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-        modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-        modImplementation "ru.kelcuprum:AlinLib-fabric:${rootProject.alinlib}+mc${project.minecraft_version_alinlib}"
+        implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+        implementation "ru.kelcuprum:AlinLib-fabric:${rootProject.alinlib}+mc${project.minecraft_version_alinlib}"
     }
 
     subprojects.each {
@@ -100,12 +74,7 @@ dependencies {
     }
 }
 
-int JAVA_COMPATIBILITY
-if (mcVersion >= 12005) {
-    JAVA_COMPATIBILITY = 21
-} else {
-    JAVA_COMPATIBILITY = 17
-}
+int JAVA_COMPATIBILITY = 25
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
     it.options.release = JAVA_COMPATIBILITY
@@ -116,16 +85,11 @@ shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir('devlibs'))
 }
 
-remapJar {
-    dependsOn tasks.shadowJar
-    inputFile.set(tasks.shadowJar.archiveFile)
-}
-
 components.java.withVariantsFromConfiguration(configurations.shadowRuntimeElements) { skip() }
 
 jar {
     from("LICENSE.md") {
-        rename { "${it}_${project.archivesBaseName}"}
+        rename { "${it}_${project.archives_base_name}"}
     }
 }
 
@@ -164,7 +128,7 @@ modrinth {
     changelog = file("../../changelog.md").text
     versionNumber = rootProject.mod_version
     versionType = rootProject.version_type // This is the default -- can also be `beta` or `alpha`
-    uploadFile = remapJar // With Loom, this MUST be set to `remapJar` instead of `jar`!
+    uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
     project.modrinth_versions.split(", ").each {
         gameVersions.add it
     }

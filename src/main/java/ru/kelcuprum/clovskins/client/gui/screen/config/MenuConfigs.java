@@ -13,8 +13,8 @@ public class MenuConfigs {
     public static Screen build(Screen parent){
         ConfigScreenBuilder screenBuilder = new ConfigScreenBuilder(parent, Component.literal("ClovSkins"));
         screenBuilder.setCategoryTitle(Component.translatable("clovskins.config.menu"));
-        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.main"), (s) -> AlinLib.MINECRAFT.setScreen(MainConfigs.build(parent))));
-        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.menu"), (s) -> AlinLib.MINECRAFT.setScreen(MenuConfigs.build(parent))));
+        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.main"), (s) -> AlinLib.MINECRAFT.gui.setScreen(MainConfigs.build(parent))));
+        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.menu"), (s) -> AlinLib.MINECRAFT.gui.setScreen(MenuConfigs.build(parent))));
 
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.change_default_ui"), true).setConfig(ClovSkins.config, "MENU.CHANGE_DEFAULT_UI"));
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.menu.alinlib"), false).setConfig(ClovSkins.config, "MENU.ALINLIB"));

@@ -1,10 +1,10 @@
 package ru.kelcuprum.clovskins.client.gui.screen.select;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.components.builder.button.ButtonBuilder;
 import ru.kelcuprum.alinlib.gui.components.builder.editbox.EditBoxBuilder;
@@ -43,14 +43,14 @@ public class CreateSkin extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        guiGraphics.drawCenteredString(font, title, width/2, 15, -1);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
+        guiGraphics.centeredText(font, title, width/2, 15, -1);
     }
 
     public void create(){
         name = name.toLowerCase();
-        if(ResourceLocation.isValidPath(name)){
+        if(Identifier.isValidPath(name)){
             File file = new File(getPath()+"/skins/"+name+".json");
             if(file.exists()){
                 new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.literal("File exist")).setType(ToastBuilder.Type.ERROR).buildAndShow();
@@ -59,7 +59,7 @@ public class CreateSkin extends Screen {
                     Files.writeString(file.toPath(), ClovSkins.safeSkinOption.toString(), StandardCharsets.UTF_8);
                     SkinOption skinOption = SkinOption.getSkinOption(file);
                     ClovSkins.skinOptions.put(name, skinOption);
-                    AlinLib.MINECRAFT.setScreen(new EditSkinPreset(parent, skinOption, name, false));
+                    AlinLib.MINECRAFT.gui.setScreen(new EditSkinPreset(parent, skinOption, name, false));
                 } catch (Exception ex){
                     new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.literal(ex.getMessage())).setType(ToastBuilder.Type.ERROR).buildAndShow();
                 }
@@ -70,14 +70,14 @@ public class CreateSkin extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         guiGraphics.fill(0,0,width,height, BLACK_ALPHA);
     }
 
     @Override
     public void onClose() {
         if(minecraft == null) return;
-        minecraft.setScreen(parent);
+        minecraft.gui.setScreen(parent);
     }
 }

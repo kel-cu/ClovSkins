@@ -13,16 +13,8 @@ import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.core.ClientAsset;
 //#endif
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.toast.ToastBuilder;
@@ -33,9 +25,15 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
 
@@ -94,19 +92,19 @@ public class SkinOption {
     }
 
     public PlayerSkin getPlayerSkin() throws IOException {
-        ResourceLocation skin = playerSkin == null ? getTextureSkin() :
+        Identifier skin = playerSkin == null ? getTextureSkin() :
                 //#if MC < 12109
                 //$$ playerSkin.texture();
                 //#else
                 playerSkin.body().texturePath();
         //#endif
-        ResourceLocation cape = playerSkin == null ? getTextureCape() :
+        Identifier cape = playerSkin == null ? getTextureCape() :
                 //#if MC < 12109
                 //$$ playerSkin.capeTexture();
                 //#else
                 playerSkin.cape().texturePath();
         //#endif
-        ResourceLocation elytra = playerSkin == null ? getTextureCape() :
+        Identifier elytra = playerSkin == null ? getTextureCape() :
         //#if MC < 12109
         //$$ playerSkin.elytraTexture();
                 //#else
@@ -121,7 +119,7 @@ public class SkinOption {
     }
 
     //#if MC >= 12109
-    public ClientAsset.Texture getTexture(ResourceLocation resourceLocation){
+    public ClientAsset.Texture getTexture(Identifier resourceLocation){
         if(resourceLocation == null) return null;
         return new ClientAsset.DownloadedTexture(resourceLocation, "");
     }
@@ -129,10 +127,10 @@ public class SkinOption {
 
 
 
-    public ResourceLocation getTextureSkin() throws IOException {
-        ResourceLocation location = GuiUtils.getResourceLocation("clovskins", "skins_"+ (file == null ? name.toLowerCase() : file.getName()));
+    public Identifier getTextureSkin() throws IOException {
+        Identifier location = GuiUtils.getResourceLocation("clovskins", "skins_"+ (file == null ? name.toLowerCase() : file.getName()));
         if(skin.isBlank()) return DefaultPlayerSkin.getDefaultTexture();
-        if(!ClovSkins.cacheResourceLocations.containsKey(skin)) {
+        if(!ClovSkins.cacheIdentifiers.containsKey(skin)) {
             BufferedImage image = getSourceSkin();
             if(image == null) return DefaultPlayerSkin.getDefaultTexture();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -148,12 +146,12 @@ public class SkinOption {
                 //#endif
                 Minecraft.getInstance().getTextureManager().register(location, texture);
             });
-            ClovSkins.cacheResourceLocations.put(skin, location);
+            ClovSkins.cacheIdentifiers.put(skin, location);
         }
         return location;
     }
 
-    public ResourceLocation getTextureCape(){
+    public Identifier getTextureCape(){
         return ClovSkins.capes.getOrDefault(cape, null);
     }
 
@@ -219,7 +217,7 @@ public class SkinOption {
 
     public SkinOption setSkinTexture(SkinType type, String skin){
         this.type = type;
-        ClovSkins.cacheResourceLocations.remove(skin);
+        ClovSkins.cacheIdentifiers.remove(skin);
         this.skin = skin;
         return this;
     }
@@ -245,74 +243,142 @@ public class SkinOption {
             uploadSkinToMojangAPI();
             if(cape.isBlank()) hideCapeToMojangAPI();
             else activeCapeToMojangAPI();
-            if(AlinLib.MINECRAFT.level != null && !AlinLib.MINECRAFT.isSingleplayer() && !AlinLib.MINECRAFT.isLocalServer())
+            if(AlinLib.MINECRAFT.level != null && !AlinLib.MINECRAFT.hasSingleplayerServer() && !AlinLib.MINECRAFT.isLocalServer())
                 new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.upload.multiplayer")).setType(ToastBuilder.Type.WARN).setDisplayTime(15000).buildAndShow();
             new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.translatable("clovskins.upload.done", name)).buildAndShow();
         } else ClovSkins.logger.debug("Не чет не хочу");
     }
 
-    public void uploadSkinToMojangAPI() throws IOException{
-        if(!config.getBoolean("UPLOAD_TO_MOJANG", true)) return;
-        String accessToken = AlinLib.MINECRAFT.getUser().getAccessToken();
-        HttpPost http = new HttpPost("https://api.minecraftservices.com/minecraft/profile/skins");
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addTextBody("variant", model.
-                //#if MC < 12109
-                //$$id().equals("default")
-                //#else
-                       getSerializedName().equals("wide")
-                //#endif
-                 ? "classic" : "slim");
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageIO.write(getSourceSkin(), "png", byteArrayOutputStream);
-        File file = new File(getPath()+"/temp/"+System.currentTimeMillis()+".png");
-        Files.write(file.toPath(), byteArrayOutputStream.toByteArray());
-        builder.addBinaryBody("file", file);
-        http.setEntity(builder.build());
-        http.addHeader("Authorization", "Bearer " + accessToken);
-        HttpResponse response = httpClient.execute(http);
-        if(response.getStatusLine().getStatusCode() == 200){
-            ClovSkins.logger.log("ok");
-            file.delete();
-        }
-        else {
-            file.delete();
-            throw new RuntimeException("[SKIN] "+response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
-        }
-    }
-    public void activeCapeToMojangAPI() throws IOException{
-        if(!config.getBoolean("UPLOAD_TO_MOJANG", true)) return;
-        String accessToken = AlinLib.MINECRAFT.getUser().getAccessToken();
-        HttpPut http = new HttpPut("https://api.minecraftservices.com/minecraft/profile/capes/active");
-        HttpClient httpClient = HttpClientBuilder.create().build();
+    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("capeId", cape);
-        http.setEntity(new StringEntity(jsonObject.toString()));
-        http.addHeader("Authorization", "Bearer " + accessToken);
-        http.addHeader("Content-Type", "application/json");
-        HttpResponse response = httpClient.execute(http);
-        if(response.getStatusLine().getStatusCode() == 200){
-            ClovSkins.logger.log("ok");
-        }
-        else {
-            throw new RuntimeException("[CAPE] "+response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+    public void uploadSkinToMojangAPI()  {
+        try {
+        if (!config.getBoolean("UPLOAD_TO_MOJANG", true)) return;
+
+        String accessToken = AlinLib.MINECRAFT.getUser().getAccessToken();
+        String variant = model.getSerializedName().equals("wide") ? "classic" : "slim";
+
+        // Подготовка файла
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(getSourceSkin(), "png", baos);
+        byte[] imageBytes = baos.toByteArray();
+
+        Path tempPath = Path.of(getPath(), "temp", System.currentTimeMillis() + ".png");
+        Files.createDirectories(tempPath.getParent());
+        Files.write(tempPath, imageBytes);
+        File file = tempPath.toFile();
+
+            // Формирование multipart
+            String boundary = "----" + Instant.now().toEpochMilli();
+            String CRLF = "\r\n";
+            StringBuilder bodyBuilder = new StringBuilder();
+
+            // variant
+            bodyBuilder.append("--").append(boundary).append(CRLF)
+                    .append("Content-Disposition: form-data; name=\"variant\"").append(CRLF).append(CRLF)
+                    .append(variant).append(CRLF);
+
+            // file
+            bodyBuilder.append("--").append(boundary).append(CRLF)
+                    .append("Content-Disposition: form-data; name=\"file\"; filename=\"skin.png\"").append(CRLF)
+                    .append("Content-Type: image/png").append(CRLF).append(CRLF);
+
+            byte[] header = bodyBuilder.toString().getBytes();
+            byte[] footer = (CRLF + "--" + boundary + "--" + CRLF).getBytes();
+
+            long totalLength = header.length + imageBytes.length + footer.length;
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.minecraftservices.com/minecraft/profile/skins"))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(
+                            concatBytes(header, imageBytes, footer)))
+                    .build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                ClovSkins.logger.log("ok");
+            } else {
+                throw new RuntimeException("[SKIN] " + response.statusCode() + " " + response.body());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            // Удаляем временный файл
+            if (file.exists()) {
+                file.delete();
+            }
         }
     }
-    public void hideCapeToMojangAPI() throws IOException{
-        if(!config.getBoolean("UPLOAD_TO_MOJANG", true)) return;
-        String accessToken = AlinLib.MINECRAFT.getUser().getAccessToken();
-        HttpDelete http = new HttpDelete("https://api.minecraftservices.com/minecraft/profile/capes/active");
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        http.addHeader("Authorization", "Bearer " + accessToken);
-        HttpResponse response = httpClient.execute(http);
-        if(response.getStatusLine().getStatusCode() == 200){
-            ClovSkins.logger.log("ok");
+
+    public void activeCapeToMojangAPI() {
+        try {
+            if (!config.getBoolean("UPLOAD_TO_MOJANG", true)) return;
+
+            String accessToken = AlinLib.MINECRAFT.getUser().getAccessToken();
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("capeId", cape);
+            String jsonBody = jsonObject.toString();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.minecraftservices.com/minecraft/profile/capes/active"))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Content-Type", "application/json")
+                    .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                ClovSkins.logger.log("ok");
+            } else {
+                throw new RuntimeException("[CAPE] " + response.statusCode() + " " + response.body());
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
-        else {
-            throw new RuntimeException("[CAPE] "+response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+    }
+
+    public void hideCapeToMojangAPI() {
+        try {
+            if (!config.getBoolean("UPLOAD_TO_MOJANG", true)) return;
+
+            String accessToken = AlinLib.MINECRAFT.getUser().getAccessToken();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.minecraftservices.com/minecraft/profile/capes/active"))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .DELETE()
+                    .build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                ClovSkins.logger.log("ok");
+            } else {
+                throw new RuntimeException("[CAPE] " + response.statusCode() + " " + response.body());
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
+    }
+
+    // Вспомогательный метод для конкатенации байтовых массивов
+    private byte[] concatBytes(byte[]... arrays) {
+        int totalLength = 0;
+        for (byte[] arr : arrays) {
+            totalLength += arr.length;
+        }
+        byte[] result = new byte[totalLength];
+        int offset = 0;
+        for (byte[] arr : arrays) {
+            System.arraycopy(arr, 0, result, offset, arr.length);
+            offset += arr.length;
+        }
+        return result;
     }
 
     // Хуета
@@ -351,7 +417,7 @@ public class SkinOption {
     public static void reset(SkinOption skinOption){
         resourceLocationMap.remove(skinOption.skin);
         urls.remove(skinOption.skin);
-        ClovSkins.cacheResourceLocations.remove(skinOption.skin);
+        ClovSkins.cacheIdentifiers.remove(skinOption.skin);
     }
 
     public static SkinOption getSkinOption(File file) throws IOException {

@@ -31,12 +31,12 @@
   },
   "depends": {
     "fabricloader": "*",
-    "fabric": "*",
     "alinlib": "*",
     "minecraft": "${minecraft_dependency}"
   },
   "mixins": [
-    "clovskins.mixin.json"
+    "clovskins.mixin.json",
+    "clovskins.server.mixin.json"
   ],
   "custom": {
     "modmenu": {

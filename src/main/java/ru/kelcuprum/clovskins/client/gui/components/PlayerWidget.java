@@ -3,7 +3,7 @@ package ru.kelcuprum.clovskins.client.gui.components;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 //#if MC >= 12109
@@ -64,7 +64,7 @@ public class PlayerWidget extends AbstractButton {
         this.rotation = rotation;
     }
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         try {
             int scale = size/45;
             float followX = (float) (this.getX() + (this.getWidth() / 2)) - mouseX;

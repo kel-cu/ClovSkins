@@ -3,7 +3,7 @@ package ru.kelcuprum.clovskins.client.gui.components;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 //#if MC >= 12109
@@ -56,18 +56,20 @@ public class SkinPresetButton extends AbstractButton {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         AbstractStyle style = GuiUtils.getSelected();
         style.renderBackground$widget(guiGraphics, getX(), getY(), width, height-20, active, isHovered && mouseY < getBottom() - 20);
         //
         style.renderBackground$widget(guiGraphics, getX(), getBottom() - 20, width, 20, active, isHovered && mouseY > getBottom() - 20);
-        if (GuiUtils.isDoesNotFit(getMessage(), width, 20))
-            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, 2, style.getTextColor(active));
-        else GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), getX()+width/2, getBottom() - 14, style.getTextColor(active), true);
+//        if (GuiUtils.isDoesNotFit(getMessage(), width, 20))
+//            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, 2, style.getTextColor(active));
+//        else
+            GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), getX()+width/2, getBottom() - 14, style.getTextColor(active), true);
         // -=-=-=-
-        if (GuiUtils.isDoesNotFit(Component.literal(skinOption.name), width, 20))
-            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(skinOption.name), 2 , style.getTextColor(active), getY(), getY()+20);
-        else GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(skinOption.name), getX()+width/2, getY()+7, style.getTextColor(active), true);
+//        if (GuiUtils.isDoesNotFit(Component.literal(skinOption.name), width, 20))
+//            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(skinOption.name), 2 , style.getTextColor(active), getY(), getY()+20);
+//        else
+            GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, Component.literal(skinOption.name), getX()+width/2, getY()+7, style.getTextColor(active), true);
         if(ClovSkins.currentSkin == skinOption) guiGraphics.blit(
                         //#if MC >= 12106
                         RenderPipelines.GUI_TEXTURED,
@@ -110,17 +112,17 @@ public class SkinPresetButton extends AbstractButton {
         //#endif
     }
 
-    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-        int k = this.getX() + i;
-        int l = this.getX() + this.getWidth() - i;
-        renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getBottom()-20, l, this.getBottom(), j);
-    }
-
-    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, Component msg, int i, int j, int y, int bottom) {
-        int k = this.getX() + i;
-        int l = this.getX() + this.getWidth() - i;
-        renderScrollingString(guiGraphics, font, msg, k, y, l, bottom, j);
-    }
+//    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+//        int k = this.getX() + i;
+//        int l = this.getX() + this.getWidth() - i;
+//        renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getBottom()-20, l, this.getBottom(), j);
+//    }
+//
+//    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, Component msg, int i, int j, int y, int bottom) {
+//        int k = this.getX() + i;
+//        int l = this.getX() + this.getWidth() - i;
+//        renderScrollingString(guiGraphics, font, msg, k, y, l, bottom, j);
+//    }
 
     @Override
     //#if MC < 12109
@@ -144,7 +146,7 @@ public class SkinPresetButton extends AbstractButton {
                     new ToastBuilder().setTitle(Component.literal("ClovSkins")).setMessage(Component.literal(ex.getMessage())).setType(ToastBuilder.Type.ERROR).buildAndShow();
                 }
             }
-        } else AlinLib.MINECRAFT.setScreen(new EditSkinPreset(AlinLib.MINECRAFT.screen, skinOption, key, ClovSkins.currentSkin == skinOption));
+        } else AlinLib.MINECRAFT.gui.setScreen(new EditSkinPreset(AlinLib.MINECRAFT.gui.screen(), skinOption, key, ClovSkins.currentSkin == skinOption));
     }
 
     @Override

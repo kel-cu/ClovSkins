@@ -8,9 +8,9 @@ import ru.kelcuprum.clovskins.common.packets.SkinPresetPacketPayload;
 public class ClovSkinsCommon implements ModInitializer {
     @Override
     public void onInitialize() {
-        PayloadTypeRegistry.playS2C().register(SkinPresetPacketPayload.ID, SkinPresetPacketPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(SkinPresetPacketPayload.ID, SkinPresetPacketPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(HellolPacketPayload.ID, HellolPacketPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(HellolPacketPayload.ID, HellolPacketPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(SkinPresetPacketPayload.ID, SkinPresetPacketPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(SkinPresetPacketPayload.ID, SkinPresetPacketPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(HellolPacketPayload.ID, HellolPacketPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(HellolPacketPayload.ID, HellolPacketPayload.CODEC);
     }
 }

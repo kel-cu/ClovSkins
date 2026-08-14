@@ -2,7 +2,7 @@ package ru.kelcuprum.clovskins.client.gui.screen.select;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 //#if MC < 12109
 //$$ import net.minecraft.client.resources.PlayerSkin;
@@ -120,7 +120,7 @@ public class EditSkinPreset extends Screen {
                         //#endif
                         .WIDE ? 0 : 1).setWidth(componentSize/2-2).setPosition(x+componentSize/2+2, y).build());
         addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.remove"), (s) -> {
-            AlinLib.MINECRAFT.setScreen(new ConfirmScreen(parent, Component.translatable("clovskins.edit.remove.title"), Component.translatable("clovskins.edit.remove.description"), (b) -> {
+            AlinLib.MINECRAFT.gui.setScreen(new ConfirmScreen(parent, Component.translatable("clovskins.edit.remove.title"), Component.translatable("clovskins.edit.remove.description"), (b) -> {
                 if(b){
                     this.isDeleted = true;
                     onClose();
@@ -128,7 +128,7 @@ public class EditSkinPreset extends Screen {
             }));
         }).setSprite(DONT).setWidth(20).setPosition(x+componentSize+5, y).build());
         y+=25;
-        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.select_cape"), (s) -> AlinLib.MINECRAFT.setScreen(new SelectCape(AlinLib.MINECRAFT.screen, skinOption, key))).setWidth(componentSize).setPosition(x, y).build());
+        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.edit.select_cape"), (s) -> AlinLib.MINECRAFT.gui.setScreen(new SelectCape(AlinLib.MINECRAFT.gui.screen(), skinOption, key))).setWidth(componentSize).setPosition(x, y).build());
         addRenderableWidget(new ButtonBuilder(CommonComponents.GUI_BACK, (s) -> onClose())
                 .setSprite(Icons.EXIT).setWidth(20).setPosition(x+componentSize+5, y).build());
     }
@@ -160,12 +160,12 @@ public class EditSkinPreset extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         int playerHeight = (int) ((height - 20 - font.lineHeight - 30) * 0.8);
         guiGraphics.fill(0, 0, width, height, BLACK_ALPHA);
         guiGraphics.fill(0, height/2-playerHeight/2-15, playerHeight/2+30, height/2+playerHeight/2+15, BLACK_ALPHA);
-        guiGraphics.drawCenteredString(font, Component.translatable("clovskins.edit"), width/2, 15, -1);
+        guiGraphics.centeredText(font, Component.translatable("clovskins.edit"), width/2, 15, -1);
 
         //#if MC <= 12105
         //$$ guiGraphics.pose().pushPose();
@@ -183,7 +183,7 @@ public class EditSkinPreset extends Screen {
     }
 
     public double currentTime = getTime();
-    public void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size, float tick){
+    public void renderPlayer(GuiGraphicsExtractor guiGraphics, int x, int y, int size, float tick){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
             //#if MC <= 12105
@@ -240,7 +240,7 @@ public class EditSkinPreset extends Screen {
                 }
                 skinOption.delete();
                 ClovSkins.skinOptions.remove(key);
-                AlinLib.MINECRAFT.setScreen(parent);
+                AlinLib.MINECRAFT.gui.setScreen(parent);
             } else {
                 skinOption.save();
                 if(ClovSkins.currentSkin == skinOptionOriginal) {
@@ -262,6 +262,6 @@ public class EditSkinPreset extends Screen {
             exception.printStackTrace();
         }
 
-        AlinLib.MINECRAFT.setScreen(parent);
+        AlinLib.MINECRAFT.gui.setScreen(parent);
     }
 }

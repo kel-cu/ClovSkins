@@ -23,8 +23,8 @@ public class MainConfigs {
     public static Screen build(Screen parent){
         ConfigScreenBuilder screenBuilder = new ConfigScreenBuilder(parent, Component.literal("ClovSkins"));
         screenBuilder.setCategoryTitle(Component.translatable("clovskins.config.main"));
-        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.main"), (s) -> AlinLib.MINECRAFT.setScreen(MainConfigs.build(parent))));
-        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.menu"), (s) -> AlinLib.MINECRAFT.setScreen(MenuConfigs.build(parent))));
+        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.main"), (s) -> AlinLib.MINECRAFT.gui.setScreen(MainConfigs.build(parent))));
+        screenBuilder.addPanelWidget(new ButtonBuilder(Component.translatable("clovskins.config.menu"), (s) -> AlinLib.MINECRAFT.gui.setScreen(MenuConfigs.build(parent))));
         screenBuilder.addWidget(new ButtonBooleanBuilder(Component.translatable("clovskins.config.main.upload_to_mojang"), true).setConfig(ClovSkins.config, "UPLOAD_TO_MOJANG"));
         screenBuilder.addWidget(new CategoryBox(Component.translatable("clovskins.config.main.data"))
                 .addValue(new ButtonBooleanBuilder(Component.translatable("clovskins.config.main.data.use_global"), false).setConfig(ClovSkins.pathConfig, "USE_GLOBAL"))
@@ -39,7 +39,7 @@ public class MainConfigs {
                             for(File file : new File("config/ClovSkins/skins").listFiles()) Files.copy(file.toPath(), Path.of(ClovSkins.getPath()+"/skins/"+file.getName()), REPLACE_EXISTING);
                         }
                         ClovSkins.config = new Config(ClovSkins.getPath()+"/config.json");
-                        AlinLib.MINECRAFT.setScreen(build(parent));
+                        AlinLib.MINECRAFT.gui.setScreen(build(parent));
                     } catch (IOException e) {
                         ClovSkins.logger.log(e.getMessage(), Level.ERROR);
                         e.printStackTrace();
@@ -47,7 +47,7 @@ public class MainConfigs {
                 }))
                 .addValue(new ButtonBuilder(Component.translatable("clovskins.config.main.data.update_config")).setOnPress((s) -> {
                     ClovSkins.config = new Config(ClovSkins.getPath()+"/config.json");
-                    AlinLib.MINECRAFT.setScreen(build(parent));
+                    AlinLib.MINECRAFT.gui.setScreen(build(parent));
                 })));
         return screenBuilder.build();
     }

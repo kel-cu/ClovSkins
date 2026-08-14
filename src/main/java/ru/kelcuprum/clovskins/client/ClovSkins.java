@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.CrashReport;
 import net.minecraft.client.Minecraft;
@@ -21,7 +22,7 @@ import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.entity.player.PlayerModelType;
 //#endif
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.AlinLogger;
 import ru.kelcuprum.alinlib.WebAPI;
@@ -61,7 +62,7 @@ public class ClovSkins implements ClientModInitializer {
     public static PlayerSkin defaultSkin = DefaultPlayerSkin.getDefaultSkin();
     public static String cape;
 
-    public static HashMap<String, ResourceLocation> cacheResourceLocations = new HashMap<>();
+    public static HashMap<String, Identifier> cacheIdentifiers = new HashMap<>();
     public static SkinOption currentSkin = null;
     public static SkinOption safeSkinOption = new SkinOption("default", "MHF_Steve", "",
             //#if MC < 12109
@@ -88,6 +89,8 @@ public class ClovSkins implements ClientModInitializer {
     public static boolean connectedSupportedServer = false;
     @Override
     public void onInitializeClient() {
+        PayloadTypeRegistry.clientboundConfiguration().register(SkinPresetPacketPayload.ID, SkinPresetPacketPayload.CODEC);
+        PayloadTypeRegistry.clientboundConfiguration().register(HellolPacketPayload.ID, HellolPacketPayload.CODEC);
         // Логи
         if(AlinLib.isAprilFool()) logger.log("Welcome to the circus!");
         else logger.log("Welcome to hell!");
@@ -197,7 +200,7 @@ public class ClovSkins implements ClientModInitializer {
             config.setString("SELECTED", "default");
         }
     }
-    public static HashMap<String, ResourceLocation> capes = new HashMap<>();
+    public static HashMap<String, Identifier> capes = new HashMap<>();
     public static HashMap<String, String> capesAliases = new HashMap<>();
     public void loadCapes() throws IOException, InterruptedException {
         if(Player.isLicenseAccount()){
@@ -210,7 +213,7 @@ public class ClovSkins implements ClientModInitializer {
                     String id = getStringInJSON("id", data, "");
                     String url = getStringInJSON("url", data, "");
                     if(getStringInJSON("state", data, "INACTIVE").equalsIgnoreCase("active")) cape = id;
-                    ResourceLocation location = GuiUtils.getResourceLocation("clovskins", "cape_"+id.toLowerCase().replace("-", "_"));
+                    Identifier location = GuiUtils.getResourceLocation("clovskins", "cape_"+id.toLowerCase().replace("-", "_"));
                     capesAliases.put(id, name);
                     BufferedImage image = ImageIO.read(new URL(url));
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -224,7 +227,7 @@ public class ClovSkins implements ClientModInitializer {
                             //$$ new DynamicTexture(nativeImage);
                             //#endif
                     Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().register(location, texture));
-                    ClovSkins.cacheResourceLocations.put(url, location);
+                    ClovSkins.cacheIdentifiers.put(url, location);
                     capes.put(id, location);
                 }
             }

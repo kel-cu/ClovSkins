@@ -18,7 +18,7 @@ public class OptionsScreenMixin {
     @Inject(method = "openScreenButton", at= @At(value = "HEAD"), cancellable = true)
     void openScreenButton(Component component, Supplier<Screen> supplier, CallbackInfoReturnable<Button> cir){
         if(component.contains(Component.translatable("options.skinCustomisation"))) {
-            cir.setReturnValue(Button.builder(component, (button) -> AlinLib.MINECRAFT.setScreen(ClovSkins.getSkinCustom((Screen) (Object) this))).build());
+            cir.setReturnValue(Button.builder(component, (button) -> AlinLib.MINECRAFT.gui.setScreen(ClovSkins.getSkinCustom((Screen) (Object) this))).build());
         }
     }
 }

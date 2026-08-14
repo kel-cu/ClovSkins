@@ -1,6 +1,6 @@
 package ru.kelcuprum.clovskins.client.gui.screen.select;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -97,18 +97,18 @@ public class SelectCape extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         guiGraphics.fill(0, 0, width, height, BLACK_ALPHA);
         guiGraphics.fill(0, 30 + font.lineHeight, width, height - 30, BLACK_ALPHA);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        guiGraphics.drawCenteredString(font, title, width/2, 15, -1);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
+        guiGraphics.centeredText(font, title, width/2, 15, -1);
         guiGraphics.enableScissor(0, 30+font.lineHeight, width, height-30);
-        if (scroller_pages != null) for (AbstractWidget widget : scroller_pages.widgets) widget.render(guiGraphics, i, j, f);
+        if (scroller_pages != null) for (AbstractWidget widget : scroller_pages.widgets) widget.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.disableScissor();
     }
 
@@ -134,6 +134,6 @@ public class SelectCape extends Screen {
         } catch (Exception exception){
             exception.printStackTrace();
         }
-        minecraft.setScreen(parent);
+        minecraft.gui.setScreen(parent);
     }
 }

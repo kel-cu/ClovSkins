@@ -2,7 +2,7 @@ package ru.kelcuprum.clovskins.client.gui.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 //#if MC >= 12109
@@ -43,23 +43,23 @@ public class MainScreen extends Screen {
 //        pb = addRenderableWidget(new PlayerButton(50, height/2-100, 100, true, true, false, false));
 //        pb.active = false;
 
-        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.main.select"), (s) -> AlinLib.MINECRAFT.setScreen(new SelectSkinPreset(this))).setSize(buttonsWidth, 20).setPosition(x, y).build());
+        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.main.select"), (s) -> AlinLib.MINECRAFT.gui.setScreen(new SelectSkinPreset(this))).setSize(buttonsWidth, 20).setPosition(x, y).build());
         x+=buttonsWidth+5;
-        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.main.options"), (s) -> AlinLib.MINECRAFT.setScreen(ClovSkins.getSkinCustom(this))).setSize(buttonsWidth, 20).setPosition(x, y).build());
+        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.main.options"), (s) -> AlinLib.MINECRAFT.gui.setScreen(ClovSkins.getSkinCustom(this))).setSize(buttonsWidth, 20).setPosition(x, y).build());
         x+=buttonsWidth+5;
-        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.main.configs"), (s) -> AlinLib.MINECRAFT.setScreen(MainConfigs.build(this))).setSize(buttonsWidth, 20).setPosition(x, y).build());
+        addRenderableWidget(new ButtonBuilder(Component.translatable("clovskins.main.configs"), (s) -> AlinLib.MINECRAFT.gui.setScreen(MainConfigs.build(this))).setSize(buttonsWidth, 20).setPosition(x, y).build());
         x+=buttonsWidth+5;
         addRenderableWidget(new ButtonBuilder(CommonComponents.GUI_BACK, (s) -> onClose()).setSprite(EXIT).setSize(20, 20).setPosition(x, y).build());
         y-=25;
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         guiGraphics.fill(0, 0, width, height, BLACK_ALPHA);
     }
     public static double currentTime = getTime();
-    public static void renderPlayer(GuiGraphics guiGraphics, int x, int y, int size, float tick){
+    public static void renderPlayer(GuiGraphicsExtractor guiGraphics, int x, int y, int size, float tick){
         float rotation = (float) ((getTime() - currentTime) * 35.0f);
         try {
             try {
@@ -72,9 +72,9 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        guiGraphics.drawCenteredString(font, Component.translatable("clovskins.main", FabricLoader.getInstance().isDevelopmentEnvironment() ? System.getProperty("user.name") : Player.getName()), width / 2, 10, -1);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
+        guiGraphics.centeredText(font, Component.translatable("clovskins.main", FabricLoader.getInstance().isDevelopmentEnvironment() ? System.getProperty("user.name") : Player.getName()), width / 2, 10, -1);
         int playerHeight = (int) ((height - 20 - font.lineHeight - 30) * 0.8);
         renderPlayer(guiGraphics, width/2-playerHeight/4, height/2-playerHeight/2+20, playerHeight/2, f);
     }
@@ -82,7 +82,7 @@ public class MainScreen extends Screen {
     @Override
     public void onClose() {
         if(minecraft == null) return;
-        minecraft.setScreen(screen);
+        minecraft.gui.setScreen(screen);
     }
 
     //#if MC < 12109

@@ -2,7 +2,7 @@ package ru.kelcuprum.clovskins.client.gui.components;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 //#if MC >= 12109
@@ -67,7 +67,7 @@ public class PlayerButton extends AbstractButton {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int scale = size / 45;
         float followX = (float) (this.getX() + (this.getWidth() / 2)) - mouseX;
         float followY = (float) (((float) (this.getY() + (this.height / 2.5)) - mouseY) - (7.5 * scale * AlinLib.MINECRAFT.options.guiScale().get()));
@@ -116,16 +116,17 @@ public class PlayerButton extends AbstractButton {
         //#endif
         AbstractStyle style = ClovSkins.config.getBoolean("MENU.ALINLIB", false) ? GuiUtils.getSelected() : ClovSkins.vanillaLikeStyle;
         style.renderBackground$widget(guiGraphics, getX(), getBottom() - 20, width, 20, active, isHovered && mouseY > getBottom() - 20);
-        if (GuiUtils.isDoesNotFit(getMessage(), width, 20))
-            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, 2, style.getTextColor(active));
-        else GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), getX()+width/2, getBottom() - 14, style.getTextColor(active), true);
+//        if (GuiUtils.isDoesNotFit(getMessage(), width, 20))
+//            renderScrollingString(guiGraphics, AlinLib.MINECRAFT.font, 2, style.getTextColor(active));
+//        else
+            GuiUtils.drawCenteredString(guiGraphics, AlinLib.MINECRAFT.font, getMessage(), getX()+width/2, getBottom() - 14, style.getTextColor(active), true);
     }
 
-    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-        int k = this.getX() + i;
-        int l = this.getX() + this.getWidth() - i;
-        renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getBottom()-20, l, this.getY() + this.getHeight(), j);
-    }
+//    protected void renderScrollingString(GuiGraphicsExtractor guiGraphics, Font font, int i, int j) {
+//        int k = this.getX() + i;
+//        int l = this.getX() + this.getWidth() - i;
+//        renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getBottom()-20, l, this.getY() + this.getHeight(), j);
+//    }
 
     @Override
     public void onPress(
@@ -133,7 +134,7 @@ public class PlayerButton extends AbstractButton {
             InputWithModifiers input
             //#endif
     ) {
-        AlinLib.MINECRAFT.setScreen(new MainScreen(AlinLib.MINECRAFT.screen));
+        AlinLib.MINECRAFT.gui.setScreen(new MainScreen(AlinLib.MINECRAFT.gui.screen()));
     }
 
     @Override
